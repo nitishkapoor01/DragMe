@@ -271,8 +271,6 @@ input:focus, textarea:focus, select:focus {
   border: 2px solid rgba(255, 255, 255, 0.15);
   background: #13141b;
 }
-  color: var(--text-primary);
-}
 
 /* -------------------------------------------------------------
    3-COLUMN LAYOUT

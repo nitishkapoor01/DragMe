@@ -87,7 +87,6 @@ const AppRouter = {
         }
       }
     });
-  },
 
     // Bottom profile card click
     document.getElementById('sidebar-profile-card')?.addEventListener('click', () => {
