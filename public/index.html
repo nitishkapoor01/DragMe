@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DragMe — Put it out there. Dual-Identity Social & Hangout Network</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/components.css">
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <header class="navbar">
+    <div class="nav-brand">
+      <a href="#home" class="brand-logo" id="logo-home-link">
+        DRAGME <span class="logo-crown">👑</span>
+      </a>
+    </div>
+
+    <!-- Center Search Bar -->
+    <div class="nav-search-container">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+      <input type="text" id="global-search-input" placeholder="Search rooms, topics or people...">
+    </div>
+
+    <!-- Right Header Actions -->
+    <div class="nav-actions">
+      <!-- Dual Identity Mode Switcher -->
+      <div class="identity-switch-container" title="Switch Identity Mode">
+        <button class="identity-btn active public-mode" id="btn-mode-public">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+          Public
+        </button>
+        <button class="identity-btn ghost-mode" id="btn-mode-ghost">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6M10 22h4M12 2a8 8 0 0 0-8 8c0 3 2 5.5 5 7.5V20a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2v-2.5c3-2 5-4.5 5-7.5a8 8 0 0 0-8-8z"/></svg>
+          Ghost
+        </button>
+      </div>
+
+      <!-- Create Button (+) -->
+      <button class="header-action-circle plus-btn" id="btn-header-create-post" title="Create New Post">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+      </button>
+
+      <!-- Theme Switch Icon -->
+      <button class="header-action-circle" id="btn-theme-toggle" title="Theme Toggle">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+      </button>
+
+      <!-- Streak Counter -->
+      <div class="header-streak-badge" title="Active Daily Streak">
+        <span class="streak-icon">🔥</span>
+        <span class="streak-num">12</span>
+      </div>
+
+      <!-- Messages / Chat Icon -->
+      <button class="header-action-circle" id="btn-header-messages" title="Messages">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+        <span class="badge-count">3</span>
+      </button>
+
+      <!-- Notifications Icon -->
+      <button class="header-action-circle" id="btn-header-notifications" title="Notifications">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+      </button>
+
+      <!-- User Profile / Auth Container -->
+      <div id="nav-auth-actions"></div>
+    </div>
+  </header>
+
+  <!-- 3-Column Main Layout -->
+  <div class="app-container">
+
+    <!-- LEFT SIDEBAR -->
+    <aside class="sidebar-left">
+      <nav class="nav-links">
+        <a href="#home" class="nav-link active" id="nav-item-home">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+          Home
+        </a>
+
+        <div class="nav-section-title">DISCOVER</div>
+
+        <a href="#communities" class="nav-link" id="nav-item-communities">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+          Communities
+        </a>
+
+        <a href="#rooms" class="nav-link" id="nav-item-rooms">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+          Rooms
+        </a>
+
+        <a href="#random" class="nav-link" id="nav-item-random">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon></svg>
+          Random
+        </a>
+
+        <a href="#stories" class="nav-link" id="nav-item-stories">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+          Stories
+        </a>
+
+        <a href="#confessions" class="nav-link" id="nav-item-confessions">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+          Confessions
+        </a>
+
+        <a href="#founder-hub" class="nav-link" id="nav-item-founder">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+          Founder Hub
+          <span class="badge-official">OFFICIAL</span>
+        </a>
+
+        <!-- Create Room Button -->
+        <button class="btn-create-room-sidebar" id="btn-sidebar-create-room">
+          + Create Room
+        </button>
+
+        <div class="nav-section-title active-rooms-title">YOUR ACTIVE ROOMS</div>
+
+        <div class="active-rooms-list">
+          <div class="active-room-item" data-room-topic="fitness">
+            <span class="room-icon">⚔️</span> Fitness & Health
+          </div>
+          <div class="active-room-item" data-room-topic="gaming">
+            <span class="room-icon">🎮</span> Gaming & Esports
+          </div>
+          <div class="active-room-item" data-room-topic="movies">
+            <span class="room-icon">🎬</span> Movie Buffs
+          </div>
+          <div class="active-room-item" data-room-topic="design">
+            <span class="room-icon">🎨</span> Design & UI/UX
+          </div>
+          <a href="#rooms" class="view-all-link">View all →</a>
+        </div>
+      </nav>
+
+      <!-- Bottom User/Official Card -->
+      <div class="sidebar-bottom-profile" id="sidebar-profile-card">
+        <img class="bottom-profile-avatar" src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=80" alt="Avatar">
+        <div class="bottom-profile-info">
+          <div class="bottom-profile-name">DragMe Official</div>
+          <div class="bottom-profile-status">● Live in Lounge</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- CENTER FEED SECTION -->
+    <main class="main-feed-column">
+      
+      <!-- Feed Filter Tabs Bar -->
+      <div class="feed-tabs-bar">
+        <div class="feed-tabs-left">
+          <button class="feed-tab active" data-filter="all">For You</button>
+          <button class="feed-tab" data-filter="trending">🔥 Trending</button>
+          <button class="feed-tab" data-filter="new">New</button>
+          <button class="feed-tab" data-filter="following">Following</button>
+          <button class="feed-tab" data-filter="communities">Communities</button>
+        </div>
+        <button class="feed-filter-btn" id="btn-feed-filter">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg>
+          Filters
+        </button>
+      </div>
+
+      <!-- Feed Posts Stream -->
+      <div class="posts-stream" id="posts-stream"></div>
+      
+      <!-- Feed Loader Spinner -->
+      <div id="feed-loader" style="text-align: center; padding: 20px; display: none;">
+        <div class="spinner-ring"></div>
+      </div>
+    </main>
+
+    <!-- RIGHT SIDEBAR (Widgets) -->
+    <aside class="sidebar-right">
+
+      <!-- Widget 1: Trending Drags -->
+      <div class="widget-box">
+        <div class="widget-header">
+          <h4><span style="color: var(--neon-red);">🔥</span> TRENDING DRAGS</h4>
+          <a href="#trending" class="widget-view-all">View all</a>
+        </div>
+        <div class="trending-list" id="widget-trending-list">
+          <div class="trending-item">
+            <span class="trending-rank">1</span>
+            <span class="trending-title">Anonymous Post 1 in Thread 1</span>
+            <span class="trending-tag red-pill">17%</span>
+          </div>
+          <div class="trending-item">
+            <span class="trending-rank">2</span>
+            <span class="trending-title">Building pixel-perfect UI de...</span>
+            <span class="trending-tag red-pill">0%</span>
+          </div>
+          <div class="trending-item">
+            <span class="trending-rank">3</span>
+            <span class="trending-title">Building pixel-perfect UI de...</span>
+            <span class="trending-tag red-pill">0%</span>
+          </div>
+          <div class="trending-item">
+            <span class="trending-rank">4</span>
+            <span class="trending-title">Confession: I overthink ever...</span>
+            <span class="trending-tag red-pill">0%</span>
+          </div>
+          <div class="trending-item">
+            <span class="trending-rank">5</span>
+            <span class="trending-title">Look at this new UI render ht...</span>
+            <span class="trending-tag red-pill">0%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Widget 2: Most Cooked Today -->
+      <div class="widget-box">
+        <div class="widget-header">
+          <h4><span style="color: var(--neon-flame);">🔥</span> MOST COOKED TODAY</h4>
+          <a href="#cooked" class="widget-view-all">View all</a>
+        </div>
+        <div class="cooked-list" id="widget-cooked-list">
+          <div class="cooked-item">
+            <div class="cooked-avatar-box">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm1 15h-2v-2h2zm0-4h-2V7h2z"/></svg>
+            </div>
+            <div class="cooked-details">
+              <div class="cooked-title">Anonymous Post 11..</div>
+              <div class="cooked-sub">#Design Roast</div>
+            </div>
+            <div class="cooked-meter">
+              <div class="circle-progress active"></div>
+            </div>
+          </div>
+
+          <div class="cooked-item">
+            <div class="cooked-avatar-box">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm1 15h-2v-2h2zm0-4h-2V7h2z"/></svg>
+            </div>
+            <div class="cooked-details">
+              <div class="cooked-title">Confession: I overt...</div>
+              <div class="cooked-sub">#Confessions</div>
+            </div>
+            <div class="cooked-meter">
+              <div class="circle-progress"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Widget 3: People Need Help (SOS) -->
+      <div class="widget-box">
+        <div class="widget-header">
+          <h4><span class="sos-badge">SOS</span> PEOPLE NEED HELP</h4>
+          <a href="#help" class="widget-view-all">View all</a>
+        </div>
+        <div class="sos-content-box">
+          <p class="sos-empty-text">No active help requests right now.</p>
+          <a href="#ask-help" class="sos-action-link" id="btn-sos-ask">Ask for Help / Advice →</a>
+        </div>
+      </div>
+
+    </aside>
+
+  </div>
+
+  <!-- Toast Notification System -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Core Scripts -->
+  <script src="/js/api.js"></script>
+  <script src="/js/ws.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/postRenderer.js"></script>
+  <script src="/js/feed.js"></script>
+  <script src="/js/createPostModal.js"></script>
+  <script src="/js/hangouts.js"></script>
+  <script src="/js/matchmaker.js"></script>
+  <script src="/js/profile.js"></script>
+  <script src="/js/admin.js"></script>
+  <script src="/js/app.js"></script>
+</body>
+</html>

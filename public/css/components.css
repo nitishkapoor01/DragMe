@@ -1,0 +1,525 @@
+/* ==========================================================================
+   DRAGME POST CARDS & INTERACTION COMPONENTS (PIXEL-PERFECT SPEC)
+   ========================================================================== */
+
+/* Main Post Card Container */
+.post-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-lg);
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  position: relative;
+  transition: border-color var(--transition-fast);
+}
+
+.post-card:hover {
+  border-color: var(--border-hover);
+}
+
+/* Post Header */
+.post-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.post-author-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.author-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #1c1e2b;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.author-avatar.ghost-avatar {
+  border-color: var(--neon-magenta);
+  background: #1a0815;
+}
+
+.author-meta-text {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #fff;
+  flex-wrap: wrap;
+}
+
+.author-topic {
+  color: #eab308; /* Yellow/Gold accent for topic */
+  font-weight: 600;
+  font-size: 0.84rem;
+}
+
+.author-dot {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+.author-time {
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.post-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-discuss-pill {
+  background: #191a24;
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  text-transform: uppercase;
+  transition: all var(--transition-fast);
+}
+
+.btn-discuss-pill:hover {
+  background: #232638;
+  color: #fff;
+}
+
+.btn-post-menu {
+  background: transparent;
+  color: var(--text-muted);
+  padding: 4px 8px;
+  font-size: 1.1rem;
+  border-radius: var(--radius-sm);
+  transition: color var(--transition-fast);
+}
+
+.btn-post-menu:hover {
+  color: #fff;
+}
+
+/* Post Body Content */
+.post-body-text {
+  font-size: 0.92rem;
+  color: var(--text-primary);
+  line-height: 1.55;
+  word-break: break-word;
+}
+
+.post-title {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #fff;
+}
+
+/* Media Showcase Container */
+.post-media-box {
+  width: 100%;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: #000;
+  margin-top: 4px;
+}
+
+.post-media-box img {
+  width: 100%;
+  max-height: 520px;
+  object-fit: cover;
+  display: block;
+}
+
+/* -------------------------------------------------------------
+   FORMAT 1: CONFESSION CARD
+   ------------------------------------------------------------- */
+.post-card.format-confession {
+  background: linear-gradient(145deg, #180d1e 0%, #12131a 100%);
+  border: 1px solid rgba(254, 8, 121, 0.3);
+}
+
+.confession-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(254, 8, 121, 0.15);
+  color: var(--neon-magenta);
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: var(--radius-xs);
+  border: 1px solid rgba(254, 8, 121, 0.25);
+  margin-bottom: 6px;
+}
+
+/* -------------------------------------------------------------
+   FORMAT 3: CUSTOM VIDEO PLAYER
+   ------------------------------------------------------------- */
+.video-player-container {
+  position: relative;
+  width: 100%;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: #000;
+}
+
+.video-player-container video {
+  width: 100%;
+  max-height: 480px;
+  display: block;
+}
+
+.video-custom-controls {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.85));
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.video-player-container:hover .video-custom-controls {
+  opacity: 1;
+}
+
+.video-ctrl-btn {
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.video-progress-bar {
+  flex: 1;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+.video-progress-fill {
+  height: 100%;
+  background: var(--dragme-lime);
+  border-radius: 2px;
+  width: 0%;
+}
+
+/* -------------------------------------------------------------
+   FORMAT 4: MULTI-IMAGE CAROUSEL
+   ------------------------------------------------------------- */
+.carousel-container {
+  position: relative;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.carousel-slides {
+  display: flex;
+  transition: transform 0.3s ease;
+}
+
+.carousel-slide {
+  min-width: 100%;
+}
+
+.carousel-slide img {
+  width: 100%;
+  height: 380px;
+  object-fit: cover;
+  display: block;
+}
+
+.carousel-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.7);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.carousel-btn.prev { left: 10px; }
+.carousel-btn.next { right: 10px; }
+
+.carousel-dots {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 5px;
+}
+
+.carousel-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+}
+
+.carousel-dot.active {
+  background: var(--dragme-lime);
+  width: 18px;
+  border-radius: var(--radius-full);
+}
+
+/* -------------------------------------------------------------
+   FORMAT 6: INTERACTIVE POLL / DEBATE
+   ------------------------------------------------------------- */
+.poll-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.poll-option-btn {
+  position: relative;
+  background: #1a1b26;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  overflow: hidden;
+  transition: border-color var(--transition-fast);
+  text-align: left;
+}
+
+.poll-option-btn:hover {
+  border-color: var(--dragme-lime);
+}
+
+.poll-option-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  background: rgba(163, 230, 53, 0.18);
+  border-radius: var(--radius-md);
+  transition: width 0.5s ease;
+  pointer-events: none;
+}
+
+.poll-option-text {
+  position: relative;
+  z-index: 2;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.poll-option-percent {
+  position: relative;
+  z-index: 2;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--dragme-lime);
+}
+
+.poll-option-btn.voted {
+  border-color: var(--dragme-lime);
+}
+
+/* -------------------------------------------------------------
+   FORMAT 7: VOICE SNIPPET
+   ------------------------------------------------------------- */
+.voice-snippet-card {
+  background: #161824;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.voice-play-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--dragme-lime);
+  color: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.waveform-visualizer {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  height: 32px;
+}
+
+.waveform-bar {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+}
+
+.waveform-bar.active {
+  background: var(--dragme-lime);
+}
+
+/* -------------------------------------------------------------
+   FORMAT 8: HANGOUT INVITE
+   ------------------------------------------------------------- */
+.hangout-invite-box {
+  background: linear-gradient(135deg, rgba(163, 230, 53, 0.08) 0%, rgba(19, 20, 27, 0.9) 100%);
+  border: 1px solid rgba(163, 230, 53, 0.3);
+  border-radius: var(--radius-md);
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.btn-join-hangout {
+  background: var(--dragme-lime);
+  color: #000;
+  font-weight: 800;
+  font-size: 0.82rem;
+  padding: 8px 16px;
+  border-radius: var(--radius-full);
+}
+
+/* -------------------------------------------------------------
+   POST ACTION BUTTONS & LIQUID HEART
+   ------------------------------------------------------------- */
+.post-actions-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.action-btn-group {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.action-btn {
+  background: transparent;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.84rem;
+  font-weight: 600;
+  transition: color var(--transition-fast);
+}
+
+.action-btn svg {
+  width: 17px;
+  height: 17px;
+}
+
+.action-btn:hover {
+  color: var(--text-primary);
+}
+
+.action-btn.liked {
+  color: var(--neon-magenta);
+}
+
+.action-btn.liked svg {
+  fill: var(--neon-magenta);
+  animation: heartPop 0.4s cubic-bezier(0.17, 0.89, 0.32, 1.49);
+}
+
+@keyframes heartPop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.35); }
+  100% { transform: scale(1); }
+}
+
+.action-btn.saved {
+  color: var(--dragme-lime);
+}
+
+.action-btn.saved svg {
+  fill: var(--dragme-lime);
+}
+
+/* Comments Drawer */
+.comments-section {
+  margin-top: 10px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.comment-input-box {
+  display: flex;
+  gap: 8px;
+}
+
+.comment-input-box input {
+  flex: 1;
+}
+
+.comment-item {
+  display: flex;
+  gap: 10px;
+}
+
+.comment-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.comment-content-box {
+  background: #0d0e14;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  flex: 1;
+}
+
+.comment-author-name {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 2px;
+}
+
+.comment-text {
+  font-size: 0.84rem;
+  color: var(--text-secondary);
+}
