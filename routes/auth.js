@@ -4,8 +4,9 @@ const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const { db } = require('../db');
 const { generateToken, requireAuth, optionalAuth } = require('../middleware/auth');
-const { rateLimiter } = require('../middleware/rateLimiter');
+const { rateLimiter, recordFailedAttempt, clearFailedAttempts } = require('../middleware/rateLimiter');
 const { generateAnonymousPersona } = require('../services/privacyService');
+const { cache, cacheMiddleware } = require('../services/cacheService');
 
 // Registration
 router.post('/register', rateLimiter({ windowMs: 60000, max: 10 }), (req, res) => {
@@ -64,6 +65,7 @@ router.post('/register', rateLimiter({ windowMs: 60000, max: 10 }), (req, res) =
 // Login
 router.post('/login', rateLimiter({ windowMs: 60000, max: 15 }), (req, res) => {
   const { login, password } = req.body;
+  const clientKey = `ip_${req.ip || req.connection.remoteAddress || 'unknown'}`;
 
   if (!login || !password) {
     return res.status(400).json({ error: 'Please provide your username/email and password.' });
@@ -75,12 +77,16 @@ router.post('/login', rateLimiter({ windowMs: 60000, max: 15 }), (req, res) => {
   `).get(login, login, login);
 
   if (!user || !bcrypt.compareSync(password, user.password_hash)) {
+    recordFailedAttempt(clientKey);
     return res.status(401).json({ error: 'Invalid username/email or password.' });
   }
 
   if (user.is_banned) {
     return res.status(403).json({ error: 'Your account has been suspended for community guideline violations.' });
   }
+
+  // Clear any failed attempts upon valid credentials
+  clearFailedAttempts(clientKey);
 
   const token = generateToken(user);
   const userSafe = {
@@ -147,8 +153,11 @@ router.get('/me', optionalAuth, (req, res) => {
   });
 });
 
-// Get Public User Profile by Username
-router.get('/profile/:username', optionalAuth, (req, res) => {
+// Get Public User Profile by Username with Tagged In-Memory Cache
+router.get('/profile/:username', optionalAuth, cacheMiddleware({
+  ttlMs: 20000,
+  tag: (req) => ['tag:profiles', `tag:user:${req.params.username.toLowerCase()}`]
+}), (req, res) => {
   const username = req.params.username;
   const targetUser = db.prepare(`
     SELECT id, username, display_name, avatar_url, banner_url, bio, location,
@@ -182,7 +191,7 @@ router.get('/profile/:username', optionalAuth, (req, res) => {
   });
 });
 
-// Update Profile
+// Update Profile with Atomic Cache Invalidation
 router.put('/profile', requireAuth, (req, res) => {
   const { display_name, bio, location, avatar_url, banner_url } = req.body;
 
@@ -205,6 +214,10 @@ router.put('/profile', requireAuth, (req, res) => {
       req.user.id
     );
 
+    // Invalidate cached profile entries
+    cache.invalidateTag('tag:profiles');
+    cache.invalidateTag(`tag:user:${req.user.username.toLowerCase()}`);
+
     const updatedUser = db.prepare(`
       SELECT id, username, display_name, email, avatar_url, banner_url, bio, location,
              role, badge, custom_badge, verified, karma, reputation_score, cooked_ratio,
@@ -225,7 +238,7 @@ router.put('/profile', requireAuth, (req, res) => {
   }
 });
 
-// Follow / Unfollow Routes
+// Follow / Unfollow Routes with Cache Invalidation
 router.post('/follow/:userId', requireAuth, (req, res) => {
   const targetId = req.params.userId;
   if (targetId === req.user.id) {
@@ -243,6 +256,7 @@ router.post('/follow/:userId', requireAuth, (req, res) => {
       VALUES (?, ?)
     `).run(req.user.id, targetId);
 
+    cache.invalidateTag('tag:profiles');
     const stats = getUserStats(targetId);
 
     return res.json({
@@ -264,6 +278,7 @@ router.delete('/follow/:userId', requireAuth, (req, res) => {
       DELETE FROM user_follows WHERE follower_id = ? AND following_id = ?
     `).run(req.user.id, targetId);
 
+    cache.invalidateTag('tag:profiles');
     const stats = getUserStats(targetId);
 
     return res.json({

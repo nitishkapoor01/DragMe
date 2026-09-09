@@ -11,7 +11,10 @@ const FeedManager = {
   init() {
     this.setupTabs();
     this.setupIntersectionObserver();
-    this.loadFeed(true);
+    const hash = window.location.hash.replace('#', '');
+    if (!hash.startsWith('profile')) {
+      this.loadFeed(true);
+    }
   },
 
   setupTabs() {
@@ -54,6 +57,7 @@ const FeedManager = {
 
   async loadFeed(reset = false) {
     if (this.isLoading) return;
+    if (typeof AppRouter !== 'undefined' && AppRouter.currentView === 'profile') return;
     this.isLoading = true;
 
     const streamContainer = document.getElementById('posts-stream');
@@ -70,6 +74,9 @@ const FeedManager = {
     try {
       const data = await API.getPosts(this.currentFilter, this.offset, this.limit);
       
+      // If user switched to profile view while API was fetching, do not overwrite profile!
+      if (typeof AppRouter !== 'undefined' && AppRouter.currentView === 'profile') return;
+
       if (data.posts.length === 0 && this.offset === 0) {
         streamContainer.innerHTML = `
           <div class="cyber-card" style="text-align: center; padding: 40px 20px;">

@@ -6,9 +6,10 @@ const { requireAuth, optionalAuth } = require('../middleware/auth');
 const { rateLimiter } = require('../middleware/rateLimiter');
 const { getFYPFeed, recordPostView } = require('../services/fypService');
 const { generateAnonymousPersona, scrubPostPayload } = require('../services/privacyService');
+const { cache, cacheMiddleware } = require('../services/cacheService');
 
-// Get Feed (FYP, Confessions Lounge, Polls, Media, etc.)
-router.get('/', optionalAuth, (req, res) => {
+// Get Feed with High-Throughput Tagged Cache (FYP, Confessions Lounge, Polls, Media, etc.)
+router.get('/', optionalAuth, cacheMiddleware({ ttlMs: 10000, tag: 'tag:feed' }), (req, res) => {
   const filterType = req.query.filter || null; // 'all', 'confession', 'poll', 'meme', 'video', 'carousel', 'voice', 'hangout_invite'
   const limit = Math.min(50, Math.max(1, parseInt(req.query.limit) || 20));
   const offset = Math.max(0, parseInt(req.query.offset) || 0);
@@ -128,6 +129,10 @@ router.post('/', requireAuth, rateLimiter({ windowMs: 60000, max: 20 }), (req, r
     // Reward user with karma
     db.prepare('UPDATE users SET karma = karma + 10 WHERE id = ?').run(req.user.id);
 
+    // Invalidate feed and user profile caches
+    cache.invalidateTag('tag:feed');
+    cache.invalidateTag('tag:profiles');
+
     const createdPost = db.prepare(`
       SELECT 
         p.*,
@@ -196,12 +201,15 @@ router.post('/:id/like', requireAuth, rateLimiter({ windowMs: 60000, max: 60 }),
     }
   }
 
-  const updatedCount = db.prepare('SELECT like_count FROM posts WHERE id = ?').get(postId).like_count;
+    // Invalidate feed cache
+    cache.invalidateTag('tag:feed');
 
-  return res.json({
-    liked: hasLiked,
-    like_count: updatedCount
-  });
+    const updatedPost = db.prepare('SELECT like_count FROM posts WHERE id = ?').get(postId);
+    return res.json({
+      message: hasLiked ? 'Post liked' : 'Post unliked',
+      liked: hasLiked,
+      like_count: updatedPost ? updatedPost.like_count : 0
+    });
 });
 
 // Save / Bookmark Post

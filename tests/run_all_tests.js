@@ -324,6 +324,78 @@ async function runAllTests() {
       });
       assert.strictEqual(savedRes.status, 200);
       assert.ok(Array.isArray(savedRes.data.posts));
+    }),
+
+    // 10. Multi-Tier In-Memory Caching & ETag HTTP 304 Validation
+    runTest('In-Memory Caching & HTTP ETag 304 Not Modified', async () => {
+      // First call (MISS)
+      const res1 = await request('/api/posts?limit=10');
+      assert.strictEqual(res1.status, 200);
+      const etag = res1.headers.get('etag');
+      assert.ok(etag, 'ETag header must be returned on cached response');
+
+      // Second call with If-None-Match header (HIT -> 304 Not Modified)
+      const res2 = await request('/api/posts?limit=10', {
+        headers: { 'If-None-Match': etag }
+      });
+      assert.strictEqual(res2.status, 304, 'Server should respond with 304 Not Modified when ETag matches');
+    }),
+
+    // 11. Tag-Based Invalidation on Mutations
+    runTest('Tag-Based Cache Invalidation on Post Creation', async () => {
+      // Warm feed cache
+      await request('/api/posts?limit=10');
+
+      // Create new post (triggers cache.invalidateTag('tag:feed'))
+      const createRes = await request('/api/posts', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${testUserToken}` },
+        body: JSON.stringify({ post_type: 'text', content: 'Cache invalidation verification broadcast' })
+      });
+      assert.strictEqual(createRes.status, 201);
+
+      // Verify fresh query returns cache MISS (not stale)
+      const freshRes = await request('/api/posts?limit=10');
+      assert.strictEqual(freshRes.status, 200);
+      assert.strictEqual(freshRes.headers.get('x-cache'), 'MISS', 'Feed cache must be invalidated after mutation');
+    }),
+
+    // 12. Anti-Brute-Force Auto-Jail Lockout
+    runTest('Anti-Brute-Force Auto-Jail Lockout on 5 Failed Logins', async () => {
+      const fakeEmail = `attacker_${Date.now()}@brute.com`;
+      for (let i = 0; i < 5; i++) {
+        await request('/api/auth/login', {
+          method: 'POST',
+          body: JSON.stringify({ login: fakeEmail, password: 'WrongPassword999!' })
+        });
+      }
+
+      // 6th attempt must be locked out with 429
+      const lockedRes = await request('/api/auth/login', {
+        method: 'POST',
+        body: JSON.stringify({ login: fakeEmail, password: 'WrongPassword999!' })
+      });
+      assert.strictEqual(lockedRes.status, 429);
+      assert.ok(lockedRes.data.locked, 'Account/IP must be flagged as locked');
+    }),
+
+    // 13. Prototype Pollution Attack Immunity
+    runTest('Prototype Pollution Injection Stripping', async () => {
+      const pollutedPayload = {
+        post_type: 'text',
+        content: 'Testing prototype pollution',
+        __proto__: { admin: true },
+        constructor: { prototype: { hacked: true } }
+      };
+
+      const res = await request('/api/posts', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${testUserToken}` },
+        body: JSON.stringify(pollutedPayload)
+      });
+      assert.strictEqual(res.status, 201);
+      assert.strictEqual(Object.prototype.admin, undefined, 'Prototype pollution must be completely prevented');
+      assert.strictEqual(Object.prototype.hacked, undefined, 'Prototype pollution must be completely prevented');
     })
   ];
 
