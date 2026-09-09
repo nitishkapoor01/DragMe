@@ -103,7 +103,7 @@ input:focus, textarea:focus, select:focus {
 /* Search Bar in Header */
 .nav-search-container {
   flex: 1;
-  max-width: 480px;
+  max-width: 440px;
   position: relative;
   display: flex;
   align-items: center;
@@ -117,11 +117,11 @@ input:focus, textarea:focus, select:focus {
 
 .nav-search-container input {
   width: 100%;
-  background: #0f1016;
+  background: #0d0e13;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: var(--radius-full);
-  padding: 9px 16px 9px 38px;
-  font-size: 0.88rem;
+  padding: 8px 36px 8px 38px;
+  font-size: 0.85rem;
   color: var(--text-primary);
 }
 
@@ -131,7 +131,20 @@ input:focus, textarea:focus, select:focus {
 
 .nav-search-container input:focus {
   border-color: rgba(163, 230, 53, 0.5);
-  background: #14161f;
+  background: #12141c;
+}
+
+.search-shortcut-badge {
+  position: absolute;
+  right: 12px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 4px;
+  pointer-events: none;
 }
 
 /* Right Nav Actions */
@@ -141,44 +154,58 @@ input:focus, textarea:focus, select:focus {
   gap: 12px;
 }
 
-/* Dual Identity Switcher */
-.identity-switch-container {
+/* Nav Plus Dropdown Button */
+.nav-plus-dropdown-btn {
+  background: var(--dragme-lime);
+  border: none;
+  border-radius: var(--radius-full);
+  padding: 6px 12px;
   display: flex;
   align-items: center;
-  background: #0a0b0e;
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-full);
-  padding: 3px;
+  gap: 4px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  box-shadow: 0 0 16px rgba(163, 230, 53, 0.35);
 }
 
-.identity-btn {
+.nav-plus-dropdown-btn:hover {
+  transform: scale(1.05);
+  background: #bbf44a;
+}
+
+.nav-vertical-divider {
+  width: 1px;
+  height: 22px;
+  background: rgba(255, 255, 255, 0.08);
+  margin: 0 2px;
+}
+
+/* Cooked Streak Item */
+.header-cooked-badge {
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 5px 12px;
-  border-radius: var(--radius-full);
-  font-size: 0.78rem;
-  font-weight: 700;
-  color: var(--text-secondary);
-  background: transparent;
-  transition: all var(--transition-fast);
+  padding: 4px 8px;
+  cursor: pointer;
 }
 
-.identity-btn svg {
-  width: 13px;
-  height: 13px;
+.cooked-text-box {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
 }
 
-.identity-btn.active.public-mode {
-  background: var(--dragme-lime-gradient);
-  color: #000;
-  box-shadow: var(--glow-lime);
+.cooked-val {
+  font-size: 0.88rem;
+  font-weight: 900;
+  color: #ef4444;
 }
 
-.identity-btn.active.ghost-mode {
-  background: var(--identity-ghost-gradient);
-  color: #fff;
-  box-shadow: var(--glow-magenta);
+.cooked-lbl {
+  font-size: 0.58rem;
+  font-weight: 800;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
 }
 
 /* Header Action Circles */
@@ -186,58 +213,64 @@ input:focus, textarea:focus, select:focus {
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: #191a24;
+  background: #14151e;
   color: var(--text-primary);
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   position: relative;
+  cursor: pointer;
   transition: all var(--transition-fast);
 }
 
 .header-action-circle:hover {
-  background: #222533;
-  border-color: rgba(255, 255, 255, 0.15);
-}
-
-.header-action-circle.plus-btn {
-  background: var(--dragme-lime);
-  color: #000;
-  box-shadow: var(--glow-lime);
-}
-
-.header-action-circle.plus-btn:hover {
-  transform: scale(1.06);
+  background: #1f212f;
+  border-color: rgba(255, 255, 255, 0.18);
+  color: #fff;
 }
 
 .badge-count {
   position: absolute;
-  top: -4px;
-  right: -4px;
-  background: var(--neon-red);
+  top: -3px;
+  right: -3px;
+  background: #ef4444;
   color: #fff;
   font-size: 0.65rem;
-  font-weight: 800;
+  font-weight: 900;
   border-radius: var(--radius-full);
   min-width: 16px;
   height: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0 4px;
+  padding: 0 3px;
+  border: 2px solid #0d0e13;
 }
 
-.header-streak-badge {
+/* User Profile Nav Pill with Chevron */
+.nav-profile-dropdown-wrapper {
   display: flex;
   align-items: center;
-  gap: 5px;
-  background: #191a24;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  padding: 5px 10px;
+  gap: 6px;
+  cursor: pointer;
+  padding: 2px;
   border-radius: var(--radius-full);
-  font-size: 0.82rem;
-  font-weight: 700;
+  transition: all var(--transition-fast);
+}
+
+.nav-profile-dropdown-wrapper:hover .nav-profile-avatar-top {
+  border-color: var(--dragme-lime);
+}
+
+.nav-profile-avatar-top {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  background: #13141b;
+}
   color: var(--text-primary);
 }
 

@@ -13,7 +13,7 @@
 </head>
 <body>
 
-  <!-- Top Navigation Bar -->
+  <!-- Top Navigation Bar (Exact Spec Replica) -->
   <header class="navbar">
     <div class="nav-brand">
       <a href="#home" class="brand-logo" id="logo-home-link">
@@ -21,54 +21,46 @@
       </a>
     </div>
 
-    <!-- Center Search Bar -->
+    <!-- Center Search Bar with / shortcut -->
     <div class="nav-search-container">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
       <input type="text" id="global-search-input" placeholder="Search rooms, topics or people...">
+      <span class="search-shortcut-badge">/</span>
     </div>
 
-    <!-- Right Header Actions -->
+    <!-- Right Header Actions (Exact Replica Layout) -->
     <div class="nav-actions">
-      <!-- Dual Identity Mode Switcher -->
-      <div class="identity-switch-container" title="Switch Identity Mode">
-        <button class="identity-btn active public-mode" id="btn-mode-public">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-          Public
-        </button>
-        <button class="identity-btn ghost-mode" id="btn-mode-ghost">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6M10 22h4M12 2a8 8 0 0 0-8 8c0 3 2 5.5 5 7.5V20a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2v-2.5c3-2 5-4.5 5-7.5a8 8 0 0 0-8-8z"/></svg>
-          Ghost
-        </button>
-      </div>
-
-      <!-- Create Button (+) -->
-      <button class="header-action-circle plus-btn" id="btn-header-create-post" title="Create New Post">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+      <!-- Create Plus Button with Chevron Dropdown -->
+      <button class="nav-plus-dropdown-btn" id="btn-header-create-post" title="Create New Post / Room">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="3"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
       </button>
 
-      <!-- Theme Switch Icon -->
-      <button class="header-action-circle" id="btn-theme-toggle" title="Theme Toggle">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
-      </button>
+      <!-- Vertical Divider -->
+      <div class="nav-vertical-divider"></div>
 
-      <!-- Streak Counter -->
-      <div class="header-streak-badge" title="Active Daily Streak">
-        <span class="streak-icon">🔥</span>
-        <span class="streak-num">12</span>
+      <!-- Cooked Streak Counter -->
+      <div class="header-cooked-badge" title="Cooked Flame Streak">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"></path></svg>
+        <div class="cooked-text-box">
+          <span class="cooked-val">12</span>
+          <span class="cooked-lbl">COOKED</span>
+        </div>
       </div>
 
       <!-- Messages / Chat Icon -->
-      <button class="header-action-circle" id="btn-header-messages" title="Messages">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+      <button class="header-action-circle" id="btn-header-messages" title="Direct Messages">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
         <span class="badge-count">3</span>
       </button>
 
       <!-- Notifications Icon -->
       <button class="header-action-circle" id="btn-header-notifications" title="Notifications">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+        <span class="badge-count">9</span>
       </button>
 
-      <!-- User Profile / Auth Container -->
+      <!-- User Profile / Auth Actions Container -->
       <div id="nav-auth-actions"></div>
     </div>
   </header>

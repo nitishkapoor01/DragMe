@@ -96,55 +96,110 @@ const AuthState = {
       ghostAliasText.textContent = this.anonymousPersona.alias;
     }
 
-    // Update Nav profile button or guest buttons
+    // Update Nav profile button or guest dropdown
     const authActionsContainer = document.getElementById('nav-auth-actions');
     if (authActionsContainer) {
-      if (this.currentUser) {
-        authActionsContainer.innerHTML = `
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <button class="user-avatar-btn" id="nav-profile-btn" title="View Profile (@${this.currentUser.username})">
-              <img src="${this.currentUser.avatar_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100'}" alt="Avatar">
-              <span style="font-size: 0.82rem; font-weight: 700; color: #fff; max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">@${this.currentUser.username}</span>
-            </button>
-            <button class="icon-btn" id="nav-logout-btn" title="Logout" style="width: 32px; height: 32px;">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
-            </button>
-          </div>
-        `;
+      const avatarUrl = this.currentUser 
+        ? (this.currentUser.avatar_url || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100')
+        : 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100';
 
-        document.getElementById('nav-profile-btn')?.addEventListener('click', () => {
-          AppRouter.navigate('profile');
-        });
-        document.getElementById('nav-logout-btn')?.addEventListener('click', () => {
-          API.setToken(null);
-          AuthState.currentUser = null;
-          AuthState.isGuest = true;
-          showToast('Logged out. Switched to Guest Explore mode.');
-          AuthState.updateUI();
-          AuthState.notify();
-          FeedManager.loadFeed(true);
-        });
-      } else {
-        // Guest or Logged-out state
-        authActionsContainer.innerHTML = `
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <button class="guest-pill-badge" id="btn-guest-status" title="You are currently in Guest View-Only mode">
-              <span class="guest-dot">●</span> Guest
-            </button>
-            <button class="btn-discuss-pill" id="btn-open-login" style="padding: 5px 14px; font-size: 0.78rem;">
-              Login
-            </button>
-            <button class="header-action-circle plus-btn" id="btn-open-register" title="Sign Up" style="width: 32px; height: 32px; border-radius: var(--radius-full); font-size: 0.75rem; font-weight: 800; padding: 0 12px; width: auto;">
-              Sign Up
-            </button>
-          </div>
-        `;
+      authActionsContainer.innerHTML = `
+        <div class="nav-profile-dropdown-wrapper" id="nav-profile-btn" title="${this.currentUser ? `@${this.currentUser.username} Account` : 'Profile & Login'}">
+          <img class="nav-profile-avatar-top" src="${avatarUrl}" alt="Avatar">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--dragme-lime)" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </div>
+      `;
 
-        document.getElementById('btn-open-login')?.addEventListener('click', () => openAuthModal('login'));
-        document.getElementById('btn-open-register')?.addEventListener('click', () => openAuthModal('register'));
-        document.getElementById('btn-guest-status')?.addEventListener('click', () => openAuthModal('guest'));
-      }
+      document.getElementById('nav-profile-btn')?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.toggleNavDropdown();
+      });
     }
+  },
+
+  toggleNavDropdown() {
+    let existing = document.getElementById('nav-dropdown-menu');
+    if (existing) {
+      existing.remove();
+      return;
+    }
+
+    const menu = document.createElement('div');
+    menu.id = 'nav-dropdown-menu';
+    menu.style.cssText = `
+      position: absolute;
+      top: 60px;
+      right: 20px;
+      background: #13141d;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 8px;
+      width: 220px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    `;
+
+    if (this.currentUser) {
+      menu.innerHTML = `
+        <div style="padding: 8px 10px; border-bottom: 1px solid rgba(255,255,255,0.06); margin-bottom: 4px;">
+          <div style="font-size: 0.88rem; font-weight: 800; color: #fff;">${this.currentUser.display_name || this.currentUser.username}</div>
+          <div style="font-size: 0.74rem; color: var(--text-muted);">@${this.currentUser.username}</div>
+        </div>
+        <button class="dropdown-item-btn" id="drop-btn-profile" style="background: transparent; border: none; color: #fff; text-align: left; padding: 8px 10px; border-radius: 8px; font-size: 0.84rem; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+          👤 View Profile
+        </button>
+        <button class="dropdown-item-btn" id="drop-btn-edit" style="background: transparent; border: none; color: #fff; text-align: left; padding: 8px 10px; border-radius: 8px; font-size: 0.84rem; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+          ✏️ Edit Profile
+        </button>
+        <button class="dropdown-item-btn" id="drop-btn-logout" style="background: transparent; border: none; color: #ef4444; text-align: left; padding: 8px 10px; border-radius: 8px; font-size: 0.84rem; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+          🚪 Log Out
+        </button>
+      `;
+
+      document.body.appendChild(menu);
+
+      menu.querySelector('#drop-btn-profile').onclick = () => { menu.remove(); AppRouter.navigate('profile'); };
+      menu.querySelector('#drop-btn-edit').onclick = () => { menu.remove(); ProfileManager.openEditProfileModal(); };
+      menu.querySelector('#drop-btn-logout').onclick = () => {
+        menu.remove();
+        API.setToken(null);
+        AuthState.currentUser = null;
+        AuthState.isGuest = true;
+        showToast('Logged out successfully.', 'normal');
+        AuthState.updateUI();
+        AuthState.notify();
+        AppRouter.navigate('home');
+      };
+    } else {
+      menu.innerHTML = `
+        <button class="dropdown-item-btn" id="drop-btn-login" style="background: transparent; border: none; color: #fff; text-align: left; padding: 8px 10px; border-radius: 8px; font-size: 0.84rem; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+          ⚡ Login to Account
+        </button>
+        <button class="dropdown-item-btn" id="drop-btn-register" style="background: transparent; border: none; color: #fff; text-align: left; padding: 8px 10px; border-radius: 8px; font-size: 0.84rem; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+          🚀 Sign Up
+        </button>
+        <button class="dropdown-item-btn" id="drop-btn-founder" style="background: transparent; border: none; color: var(--dragme-lime); text-align: left; padding: 8px 10px; border-radius: 8px; font-size: 0.84rem; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+          👑 DragMe Official Profile
+        </button>
+      `;
+
+      document.body.appendChild(menu);
+
+      menu.querySelector('#drop-btn-login').onclick = () => { menu.remove(); openAuthModal('login'); };
+      menu.querySelector('#drop-btn-register').onclick = () => { menu.remove(); openAuthModal('register'); };
+      menu.querySelector('#drop-btn-founder').onclick = () => { menu.remove(); AppRouter.navigate('profile'); };
+    }
+
+    const closeHandler = (ev) => {
+      if (!menu.contains(ev.target)) {
+        menu.remove();
+        document.removeEventListener('click', closeHandler);
+      }
+    };
+    setTimeout(() => document.addEventListener('click', closeHandler), 10);
   }
 };
 

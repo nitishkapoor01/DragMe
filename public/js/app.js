@@ -25,7 +25,7 @@ const AppRouter = {
       AdminManager.openAdminDashboard();
     });
 
-    // Global Search
+    // Global Search & / Key Shortcut
     const searchInput = document.getElementById('global-search-input');
     searchInput?.addEventListener('input', (e) => {
       const q = e.target.value.toLowerCase().trim();
@@ -34,6 +34,13 @@ const AppRouter = {
         const text = card.textContent.toLowerCase();
         card.style.display = text.includes(q) ? 'flex' : 'none';
       });
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === '/' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+        e.preventDefault();
+        searchInput?.focus();
+      }
     });
 
     // Header Notifications Trigger
