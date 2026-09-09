@@ -40,17 +40,17 @@ const PostRenderer = {
 
     // Author and topic info
     const isAnon = post.is_anonymous;
-    const authorName = post.author?.username || (isAnon ? 'Ghost Persona' : 'Tester Supreme');
+    const authorName = post.author?.username || post.author_username || (isAnon ? 'Ghost Persona' : 'Tester Supreme');
     const authorAvatar = isAnon 
       ? `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(authorName)}&backgroundColor=1a0815`
-      : (post.author?.avatar_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100');
+      : (post.author?.avatar_url || post.author_avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100');
 
     const topicName = post.extra_data?.topic || (isAnon ? 'Confessions' : 'General');
     const timeFormatted = this.formatTimestamp(post.created_at);
 
     card.innerHTML = `
       <div class="post-header">
-        <div class="post-author-row" ${!isAnon && post.author?.username ? `style="cursor: pointer;" onclick="AppRouter.navigate('profile', '${post.author.username}')"` : ''}>
+        <div class="post-author-row" ${!isAnon && authorName ? `style="cursor: pointer;" onclick="AppRouter.navigate('profile', '${authorName}')"` : ''}>
           <img class="author-avatar ${isAnon ? 'ghost-avatar' : ''}" src="${authorAvatar}" alt="${authorName}" loading="lazy">
           <div class="author-meta-text">
             <span style="${!isAnon ? 'font-weight: 700; color: #fff;' : ''}">${this.escapeHTML(authorName)}</span>
