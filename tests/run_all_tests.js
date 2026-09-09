@@ -269,9 +269,9 @@ async function runAllTests() {
 
     // 9. Profile Retrieval, Highlights & Follow Lifecycle
     runTest('User Profile Query & Server-Authoritative Stats', async () => {
-      const res = await request('/api/auth/profile/DragMeMaster');
+      const res = await request('/api/auth/profile/dragme');
       assert.strictEqual(res.status, 200);
-      assert.strictEqual(res.data.user.username, 'DragMeMaster');
+      assert.strictEqual(res.data.user.username, 'dragme');
       assert.ok(res.data.stats);
       assert.strictEqual(typeof res.data.stats.followers_count, 'number');
       assert.strictEqual(typeof res.data.stats.following_count, 'number');

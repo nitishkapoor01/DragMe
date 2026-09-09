@@ -145,5 +145,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   // 7. Initialize Global App Router & Bindings
   AppRouter.init();
 
+  // 8. Handle initial URL hash
+  const initialHash = window.location.hash.replace('#', '');
+  if (initialHash.startsWith('profile')) {
+    const parts = initialHash.split('/');
+    AppRouter.navigate('profile', parts[1] || null);
+  } else if (initialHash === 'confessions') {
+    AppRouter.navigate('confessions');
+  }
+
   console.log('🌌 DragMe Ready: Put it out there.');
 });

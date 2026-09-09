@@ -70,8 +70,9 @@ router.post('/login', rateLimiter({ windowMs: 60000, max: 15 }), (req, res) => {
   }
 
   const user = db.prepare(`
-    SELECT * FROM users WHERE username = ? OR email = ?
-  `).get(login, login);
+    SELECT * FROM users 
+    WHERE LOWER(username) = LOWER(?) OR LOWER(email) = LOWER(?) OR (LOWER(?) = 'dragmemaster' AND LOWER(username) = 'dragme')
+  `).get(login, login, login);
 
   if (!user || !bcrypt.compareSync(password, user.password_hash)) {
     return res.status(401).json({ error: 'Invalid username/email or password.' });
@@ -85,6 +86,7 @@ router.post('/login', rateLimiter({ windowMs: 60000, max: 15 }), (req, res) => {
   const userSafe = {
     id: user.id,
     username: user.username,
+    display_name: user.display_name || user.username,
     email: user.email,
     avatar_url: user.avatar_url,
     banner_url: user.banner_url,
@@ -153,8 +155,8 @@ router.get('/profile/:username', optionalAuth, (req, res) => {
            role, badge, custom_badge, verified, karma, reputation_score, cooked_ratio,
            judgment_accuracy, rank_title, roast_level, hangout_hours, created_at
     FROM users 
-    WHERE LOWER(username) = LOWER(?) AND is_banned = 0
-  `).get(username);
+    WHERE (LOWER(username) = LOWER(?) OR (LOWER(?) = 'dragme' AND (LOWER(username) = 'dragmemaster' OR role = 'admin')) OR (LOWER(?) = 'dragmemaster' AND LOWER(username) = 'dragme')) AND is_banned = 0
+  `).get(username, username, username);
 
   if (!targetUser) {
     return res.status(404).json({ error: 'User not found.' });

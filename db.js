@@ -310,7 +310,8 @@ function initDatabase() {
   try {
     db.prepare(`
       UPDATE users 
-      SET display_name = CASE WHEN display_name IS NULL OR display_name = '' THEN 'DragMe Official' ELSE display_name END,
+      SET username = 'dragme',
+          display_name = CASE WHEN display_name IS NULL OR display_name = '' THEN 'DragMe Official' ELSE display_name END,
           verified = 1,
           custom_badge = '👑 FOUNDER',
           badge = 'Senior Roaster',
