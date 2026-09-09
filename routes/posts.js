@@ -159,36 +159,59 @@ router.post('/', requireAuth, rateLimiter({ windowMs: 60000, max: 20 }), (req, r
   }
 });
 
-// Like / Unlike Post (Atomic)
+// Like / Crown React / Unlike Post (Atomic Signature Interaction)
 router.post('/:id/like', requireAuth, rateLimiter({ windowMs: 60000, max: 60 }), (req, res) => {
   const postId = req.params.id;
   const userId = req.user.id;
+  const reactionType = req.body.reaction_type || 'crown';
+
+  const validReactions = ['crown', 'hot', 'insight', 'relatable', 'brutal'];
+  const sanitizedReaction = validReactions.includes(reactionType) ? reactionType : 'crown';
 
   const post = db.prepare('SELECT id, user_id, is_anonymous FROM posts WHERE id = ?').get(postId);
   if (!post) {
     return res.status(404).json({ error: 'Post not found.' });
   }
 
-  const existingLike = db.prepare('SELECT id FROM post_likes WHERE post_id = ? AND user_id = ?').get(postId, userId);
+  const existingLike = db.prepare('SELECT id, reaction_type FROM post_likes WHERE post_id = ? AND user_id = ?').get(postId, userId);
 
   let hasLiked = false;
+  let activeReaction = null;
+
   if (existingLike) {
-    // Unlike
-    db.prepare('DELETE FROM post_likes WHERE post_id = ? AND user_id = ?').run(postId, userId);
-    db.prepare('UPDATE posts SET like_count = MAX(0, like_count - 1) WHERE id = ?').run(postId);
-    hasLiked = false;
+    if (req.body.unlike === true || (existingLike.reaction_type === sanitizedReaction && !req.body.switch_only)) {
+      // Unlike
+      db.prepare('DELETE FROM post_likes WHERE post_id = ? AND user_id = ?').run(postId, userId);
+      db.prepare('UPDATE posts SET like_count = MAX(0, like_count - 1) WHERE id = ?').run(postId);
+      hasLiked = false;
+      activeReaction = null;
+    } else {
+      // Switch reaction type smoothly
+      db.prepare('UPDATE post_likes SET reaction_type = ? WHERE post_id = ? AND user_id = ?').run(sanitizedReaction, postId, userId);
+      hasLiked = true;
+      activeReaction = sanitizedReaction;
+    }
   } else {
-    // Like
-    db.prepare('INSERT INTO post_likes (post_id, user_id) VALUES (?, ?)').run(postId, userId);
+    // New Crown Like
+    db.prepare('INSERT INTO post_likes (post_id, user_id, reaction_type) VALUES (?, ?, ?)').run(postId, userId, sanitizedReaction);
     db.prepare('UPDATE posts SET like_count = like_count + 1 WHERE id = ?').run(postId);
     hasLiked = true;
+    activeReaction = sanitizedReaction;
 
-    // Send notification to author if not self and not anonymous post author
+    // Send notification to author if not self and not anonymous author
     if (post.user_id !== userId) {
       const notifId = `notif_${Date.now()}_${crypto.randomBytes(3).toString('hex')}`;
+      const reactionTitles = {
+        crown: 'crowned your post 👑',
+        hot: 'reacted 🔥 Hot to your post',
+        insight: 'reacted 🧠 Mind Blown to your post',
+        relatable: 'reacted 😂 So True to your post',
+        brutal: 'reacted 💀 Savage to your post'
+      };
+      const title = reactionTitles[sanitizedReaction] || 'crowned your post 👑';
       db.prepare(`
         INSERT INTO notifications (id, user_id, sender_id, sender_name, sender_avatar, type, target_id, title, message)
-        VALUES (?, ?, ?, ?, ?, 'like', ?, 'New Reaction!', ?)
+        VALUES (?, ?, ?, ?, ?, 'like', ?, 'Crown Reaction!', ?)
       `).run(
         notifId,
         post.user_id,
@@ -196,20 +219,21 @@ router.post('/:id/like', requireAuth, rateLimiter({ windowMs: 60000, max: 60 }),
         req.user.username,
         req.user.avatar_url,
         postId,
-        `@${req.user.username} liked your post.`
+        `@${req.user.username} ${title}.`
       );
     }
   }
 
-    // Invalidate feed cache
-    cache.invalidateTag('tag:feed');
+  // Invalidate feed cache
+  cache.invalidateTag('tag:feed');
 
-    const updatedPost = db.prepare('SELECT like_count FROM posts WHERE id = ?').get(postId);
-    return res.json({
-      message: hasLiked ? 'Post liked' : 'Post unliked',
-      liked: hasLiked,
-      like_count: updatedPost ? updatedPost.like_count : 0
-    });
+  const updatedPost = db.prepare('SELECT like_count FROM posts WHERE id = ?').get(postId);
+  return res.json({
+    message: hasLiked ? `Post reacted with ${activeReaction}` : 'Post unliked',
+    liked: hasLiked,
+    reaction_type: activeReaction,
+    like_count: updatedPost ? updatedPost.like_count : 0
+  });
 });
 
 // Save / Bookmark Post

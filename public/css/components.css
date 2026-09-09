@@ -414,57 +414,290 @@
 }
 
 /* -------------------------------------------------------------
-   POST ACTION BUTTONS & LIQUID HEART
+   SIGNATURE INTERACTION: CROWN LIKE (DRAGME SIGNATURE SPEC)
    ------------------------------------------------------------- */
-.post-actions-bar {
-  display: flex;
+.crown-like-wrapper {
+  position: relative;
+  display: inline-flex;
   align-items: center;
-  justify-content: space-between;
-  padding-top: 10px;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.action-btn-group {
-  display: flex;
-  align-items: center;
-  gap: 18px;
-}
-
-.action-btn {
+.btn-crown-like {
+  position: relative;
   background: transparent;
+  color: #8A8A8A;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  padding: 4px 6px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.15s cubic-bezier(0.22, 1, 0.36, 1), color 0.15s ease;
+}
+
+/* Crown SVG Tokens (24x24, 1.5px stroke, 6px radius) */
+.crown-icon {
+  width: 24px;
+  height: 24px;
+  stroke: #8A8A8A;
+  stroke-width: 1.5px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: transparent;
+  transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+  filter: drop-shadow(0 0 0 transparent);
+}
+
+/* 02. Hover State: Subtle lift + Lime tint */
+.btn-crown-like:hover {
+  color: #C6FF00;
+  transform: translateY(-2px);
+}
+
+.btn-crown-like:hover .crown-icon {
+  stroke: #C6FF00;
+}
+
+/* 03. Press State: Slight compress (scale 0.86) */
+.btn-crown-like.is-pressing {
+  transform: scale(0.86);
+  transition: transform 0.08s ease-in;
+}
+
+/* 04 & 05. Release & Settled State: Active Crown Like */
+.btn-crown-like.liked {
+  color: #C6FF00;
+}
+
+.btn-crown-like.liked .crown-icon {
+  stroke: #C6FF00;
+  fill: #C6FF00;
+  filter: drop-shadow(0 0 12px rgba(198, 255, 0, 0.5));
+}
+
+.btn-crown-like.animate-pop .crown-icon {
+  animation: crownPopRelease 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.btn-crown-like.animate-unlike .crown-icon {
+  animation: crownUnlikeSmooth 0.35s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* Custom Reaction Colors & Badges */
+.btn-crown-like.reaction-hot { color: #FF5722; }
+.btn-crown-like.reaction-hot .crown-icon { stroke: #FF5722; fill: #FF5722; filter: drop-shadow(0 0 12px rgba(255, 87, 34, 0.5)); }
+
+.btn-crown-like.reaction-insight { color: #D946EF; }
+.btn-crown-like.reaction-insight .crown-icon { stroke: #D946EF; fill: #D946EF; filter: drop-shadow(0 0 12px rgba(217, 70, 239, 0.5)); }
+
+.btn-crown-like.reaction-relatable { color: #FACC15; }
+.btn-crown-like.reaction-relatable .crown-icon { stroke: #FACC15; fill: #FACC15; filter: drop-shadow(0 0 12px rgba(250, 204, 21, 0.5)); }
+
+.btn-crown-like.reaction-brutal { color: #E2E8F0; }
+.btn-crown-like.reaction-brutal .crown-icon { stroke: #E2E8F0; fill: #E2E8F0; filter: drop-shadow(0 0 12px rgba(226, 232, 240, 0.5)); }
+
+.btn-crown-like .crown-custom-emoji {
+  font-size: 1.25rem;
+  line-height: 1;
+  display: inline-block;
+}
+
+/* Like Counter */
+.crown-like-count {
+  font-family: var(--font-main);
+  font-size: 0.9rem;
+  font-weight: 700;
+  transition: all 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Motion Curves & Keyframes */
+@keyframes crownPopRelease {
+  0% {
+    transform: scale(0.86);
+    fill: transparent;
+  }
+  30% {
+    transform: scale(1.22);
+    fill: #C6FF00;
+  }
+  60% {
+    transform: scale(0.95);
+  }
+  100% {
+    transform: scale(1.0);
+    fill: #C6FF00;
+  }
+}
+
+@keyframes crownUnlikeSmooth {
+  0% {
+    transform: scale(1.0);
+    fill: #C6FF00;
+  }
+  40% {
+    transform: scale(0.8);
+    fill: transparent;
+    stroke: #8A8A8A;
+  }
+  100% {
+    transform: scale(1.0);
+    fill: transparent;
+    stroke: #8A8A8A;
+  }
+}
+
+/* 7. Particle Design: Radial Outward Burst */
+.crown-particles-container {
+  position: absolute;
+  top: 50%;
+  left: 14px;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.crown-particle {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #C6FF00;
+  box-shadow: 0 0 8px rgba(198, 255, 0, 0.8);
+  pointer-events: none;
+  animation: particleBurstOut 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.crown-particle.shape-crown {
+  width: 12px;
+  height: 12px;
+  background: transparent;
+  box-shadow: none;
+}
+
+.crown-particle.shape-crown svg {
+  width: 12px;
+  height: 12px;
+  fill: #C6FF00;
+}
+
+@keyframes particleBurstOut {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--tx), var(--ty)) scale(0);
+    opacity: 0;
+  }
+}
+
+/* 4. LONG PRESS / HOVER REACTION DOCK */
+.crown-reaction-dock {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(13, 14, 20, 0.95);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-full);
+  padding: 6px 10px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), 0 0 20px rgba(198, 255, 0, 0.08);
+  animation: reactionDockIn 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  transform-origin: bottom left;
+}
+
+@keyframes reactionDockIn {
+  0% {
+    opacity: 0;
+    transform: translateY(10px) scale(0.85);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.reaction-dock-item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 50%;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.reaction-dock-item:hover {
+  transform: scale(1.35) translateY(-4px);
+}
+
+.reaction-dock-icon {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.35rem;
+}
+
+.reaction-dock-icon svg {
+  width: 22px;
+  height: 22px;
+  fill: #C6FF00;
+}
+
+.reaction-dock-tooltip {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.9);
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 800;
+  white-space: nowrap;
+  padding: 3px 8px;
+  border-radius: var(--radius-xs);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.reaction-dock-item:hover .reaction-dock-tooltip {
+  opacity: 1;
+  transform: translateX(-50%) translateY(-2px);
+}
+
+.reaction-dock-more {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1px dashed rgba(255, 255, 255, 0.25);
   color: var(--text-muted);
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 0.84rem;
-  font-weight: 600;
-  transition: color var(--transition-fast);
+  justify-content: center;
+  font-size: 0.85rem;
+  transition: all var(--transition-fast);
 }
 
-.action-btn svg {
-  width: 17px;
-  height: 17px;
+.reaction-dock-more:hover {
+  border-color: #C6FF00;
+  color: #C6FF00;
 }
 
-.action-btn:hover {
-  color: var(--text-primary);
-}
-
-.action-btn.liked {
-  color: var(--neon-magenta);
-}
-
-.action-btn.liked svg {
-  fill: var(--neon-magenta);
-  animation: heartPop 0.4s cubic-bezier(0.17, 0.89, 0.32, 1.49);
-}
-
-@keyframes heartPop {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.35); }
-  100% { transform: scale(1); }
-}
-
+/* Other Post Action Buttons */
 .action-btn.saved {
   color: var(--dragme-lime);
 }

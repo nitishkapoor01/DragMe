@@ -396,6 +396,49 @@ async function runAllTests() {
       assert.strictEqual(res.status, 201);
       assert.strictEqual(Object.prototype.admin, undefined, 'Prototype pollution must be completely prevented');
       assert.strictEqual(Object.prototype.hacked, undefined, 'Prototype pollution must be completely prevented');
+    }),
+
+    // 14. Signature Crown Like & Reaction Dock Lifecycle
+    runTest('Signature Crown Like & Reaction Dock Switching', async () => {
+      // Create post
+      const createRes = await request('/api/posts', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${adminToken}` },
+        body: JSON.stringify({ post_type: 'text', content: 'Testing crown like interaction' })
+      });
+      const pId = createRes.data.post.id;
+
+      // 1. Regular Crown Like
+      const crownRes = await request(`/api/posts/${pId}/like`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${testUserToken}` },
+        body: JSON.stringify({ reaction_type: 'crown' })
+      });
+      assert.strictEqual(crownRes.status, 200);
+      assert.strictEqual(crownRes.data.liked, true);
+      assert.strictEqual(crownRes.data.reaction_type, 'crown');
+      assert.strictEqual(crownRes.data.like_count, 1);
+
+      // 2. Switch reaction to 'hot' without unliking
+      const switchRes = await request(`/api/posts/${pId}/like`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${testUserToken}` },
+        body: JSON.stringify({ reaction_type: 'hot', switch_only: true })
+      });
+      assert.strictEqual(switchRes.status, 200);
+      assert.strictEqual(switchRes.data.liked, true);
+      assert.strictEqual(switchRes.data.reaction_type, 'hot');
+      assert.strictEqual(switchRes.data.like_count, 1);
+
+      // 3. Unlike smoothly
+      const unlikeRes = await request(`/api/posts/${pId}/like`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${testUserToken}` },
+        body: JSON.stringify({ reaction_type: 'hot' })
+      });
+      assert.strictEqual(unlikeRes.status, 200);
+      assert.strictEqual(unlikeRes.data.liked, false);
+      assert.strictEqual(unlikeRes.data.like_count, 0);
     })
   ];
 

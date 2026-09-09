@@ -72,10 +72,19 @@ const PostRenderer = {
 
       <div class="post-actions-bar">
         <div class="action-btn-group">
-          <button class="action-btn btn-like ${post.has_liked ? 'liked' : ''}" data-post-id="${post.id}">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-            <span class="like-count">${post.like_count || 0}</span>
-          </button>
+          <!-- DragMe Signature Crown Like Interaction -->
+          <div class="crown-like-wrapper" data-post-id="${post.id}">
+            <button class="btn-crown-like ${post.has_liked ? 'liked' : ''} ${post.user_reaction && post.user_reaction !== 'crown' ? 'reaction-' + post.user_reaction : ''}" data-post-id="${post.id}" title="Crown Like (Press & Hold for Reactions)">
+              ${post.user_reaction && post.user_reaction !== 'crown' ? `
+                <span class="crown-custom-emoji">${post.user_reaction === 'hot' ? '🔥' : post.user_reaction === 'insight' ? '🧠' : post.user_reaction === 'relatable' ? '😂' : '💀'}</span>
+              ` : `
+                <svg class="crown-icon" viewBox="0 0 24 24">
+                  <path d="M4 18h16a1 1 0 0 0 1-1l-2-10-4.5 5-2.5-7-2.5 7L5 7l-2 10a1 1 0 0 0 1 1z" />
+                </svg>
+              `}
+              <span class="crown-like-count">${post.like_count || 0}</span>
+            </button>
+          </div>
 
           <button class="action-btn btn-comments-toggle" data-post-id="${post.id}">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
@@ -260,18 +269,8 @@ const PostRenderer = {
   },
 
   attachEventListeners(card, post) {
-    // Like button
-    const likeBtn = card.querySelector('.btn-like');
-    likeBtn?.addEventListener('click', async () => {
-      if (!AuthState.currentUser) return openAuthModal('login');
-      try {
-        const res = await API.toggleLike(post.id);
-        likeBtn.classList.toggle('liked', res.liked);
-        card.querySelector('.like-count').textContent = res.like_count;
-      } catch (err) {
-        showToast(err.message, 'error');
-      }
-    });
+    // Signature Crown Like & Reaction Dock Lifecycle
+    this.setupCrownLike(card, post);
 
     // Save button
     const saveBtn = card.querySelector('.btn-save');
@@ -504,6 +503,242 @@ const PostRenderer = {
         </div>
       </div>
     `;
+  },
+
+  // -------------------------------------------------------------
+  // SIGNATURE INTERACTION: CROWN LIKE ENGINE
+  // -------------------------------------------------------------
+  setupCrownLike(card, post) {
+    const wrapper = card.querySelector(`.crown-like-wrapper[data-post-id="${post.id}"]`);
+    const likeBtn = wrapper?.querySelector('.btn-crown-like');
+    const countEl = wrapper?.querySelector('.crown-like-count');
+    if (!wrapper || !likeBtn) return;
+
+    let pressTimer = null;
+    let isLongPress = false;
+    let isTouchDown = false;
+
+    // Press down (State 03: scale 0.86 + haptic)
+    const handleDown = (e) => {
+      isTouchDown = true;
+      isLongPress = false;
+      likeBtn.classList.add('is-pressing');
+
+      // Haptic feedback
+      if (navigator.vibrate) {
+        try { navigator.vibrate(15); } catch(err) {}
+      }
+
+      // 200ms Hold timer for Reaction Flyout Dock
+      pressTimer = setTimeout(() => {
+        if (isTouchDown) {
+          isLongPress = true;
+          likeBtn.classList.remove('is-pressing');
+          this.openReactionDock(wrapper, post, likeBtn, countEl);
+        }
+      }, 220);
+    };
+
+    // Press up / release (State 04: Pop + particles / Unlike)
+    const handleUp = async (e) => {
+      clearTimeout(pressTimer);
+      likeBtn.classList.remove('is-pressing');
+
+      if (!isTouchDown) return;
+      isTouchDown = false;
+
+      // If user triggered the long press reaction dock, don't execute regular click
+      if (isLongPress) return;
+
+      if (!AuthState.currentUser) {
+        return openAuthModal('login');
+      }
+
+      try {
+        const wasLiked = likeBtn.classList.contains('liked');
+        const res = await API.toggleLike(post.id, 'crown');
+
+        if (res.liked) {
+          // Like Settled (04 Release: Pop + Particles)
+          likeBtn.className = 'btn-crown-like liked animate-pop';
+          likeBtn.innerHTML = `
+            <svg class="crown-icon" viewBox="0 0 24 24">
+              <path d="M4 18h16a1 1 0 0 0 1-1l-2-10-4.5 5-2.5-7-2.5 7L5 7l-2 10a1 1 0 0 0 1 1z" />
+            </svg>
+            <span class="crown-like-count">${res.like_count}</span>
+          `;
+          this.triggerCrownParticleBurst(wrapper, '#C6FF00');
+          setTimeout(() => likeBtn.classList.remove('animate-pop'), 500);
+        } else {
+          // Unlike Animation (Smooth shrink -> outline)
+          likeBtn.classList.add('animate-unlike');
+          setTimeout(() => {
+            likeBtn.className = 'btn-crown-like';
+            likeBtn.innerHTML = `
+              <svg class="crown-icon" viewBox="0 0 24 24">
+                <path d="M4 18h16a1 1 0 0 0 1-1l-2-10-4.5 5-2.5-7-2.5 7L5 7l-2 10a1 1 0 0 0 1 1z" />
+              </svg>
+              <span class="crown-like-count">${res.like_count}</span>
+            `;
+          }, 200);
+        }
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    };
+
+    const handleCancel = () => {
+      clearTimeout(pressTimer);
+      isTouchDown = false;
+      likeBtn.classList.remove('is-pressing');
+    };
+
+    likeBtn.addEventListener('mousedown', handleDown);
+    likeBtn.addEventListener('mouseup', handleUp);
+    likeBtn.addEventListener('mouseleave', handleCancel);
+
+    likeBtn.addEventListener('touchstart', handleDown, { passive: true });
+    likeBtn.addEventListener('touchend', handleUp);
+    likeBtn.addEventListener('touchcancel', handleCancel);
+
+    // Desktop Right-Click or Long Hover Shortcut to Open Reaction Dock
+    likeBtn.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      this.openReactionDock(wrapper, post, likeBtn, countEl);
+    });
+  },
+
+  // 7. Particle Burst Generator (Radial Outward Spread)
+  triggerCrownParticleBurst(wrapper, themeColor = '#C6FF00') {
+    const container = document.createElement('div');
+    container.className = 'crown-particles-container';
+
+    // Spawn 5 subtle particles (mini crowns & glowing dots)
+    const count = 5;
+    for (let i = 0; i < count; i++) {
+      const particle = document.createElement('div');
+      const isCrownShape = (i % 2 === 0);
+      particle.className = `crown-particle ${isCrownShape ? 'shape-crown' : ''}`;
+
+      if (isCrownShape) {
+        particle.innerHTML = `<svg viewBox="0 0 24 24"><path d="M4 18h16a1 1 0 0 0 1-1l-2-10-4.5 5-2.5-7-2.5 7L5 7l-2 10a1 1 0 0 0 1 1z"/></svg>`;
+        particle.querySelector('svg').style.fill = themeColor;
+      } else {
+        particle.style.background = themeColor;
+        particle.style.boxShadow = `0 0 8px ${themeColor}`;
+      }
+
+      // Calculate radial vector
+      const angle = (i * (360 / count) + Math.random() * 30) * (Math.PI / 180);
+      const distance = 25 + Math.random() * 25; // 25px - 50px
+      const tx = Math.cos(angle) * distance;
+      const ty = Math.sin(angle) * distance;
+
+      particle.style.setProperty('--tx', `${tx}px`);
+      particle.style.setProperty('--ty', `${ty}px`);
+      container.appendChild(particle);
+    }
+
+    wrapper.appendChild(container);
+    setTimeout(() => container.remove(), 600);
+  },
+
+  // 4. Long Press Reactions Flyout Dock
+  openReactionDock(wrapper, post, likeBtn, countEl) {
+    // Close existing open docks
+    document.querySelectorAll('.crown-reaction-dock').forEach(d => d.remove());
+
+    const reactions = [
+      { id: 'crown', label: 'Crown Like', emoji: '👑', color: '#C6FF00', isCrown: true },
+      { id: 'hot', label: 'Hot This!', emoji: '🔥', color: '#FF5722' },
+      { id: 'insight', label: 'Mind = Blown', emoji: '🧠', color: '#D946EF' },
+      { id: 'relatable', label: 'So True', emoji: '😂', color: '#FACC15' },
+      { id: 'brutal', label: 'Savage', emoji: '💀', color: '#E2E8F0' },
+      { id: 'more', label: 'More Coming', emoji: '+', isMore: true }
+    ];
+
+    const dock = document.createElement('div');
+    dock.className = 'crown-reaction-dock';
+
+    reactions.forEach(r => {
+      const item = document.createElement('div');
+      item.className = 'reaction-dock-item';
+      item.dataset.reactionId = r.id;
+
+      if (r.isMore) {
+        item.innerHTML = `
+          <div class="reaction-dock-more">+</div>
+          <div class="reaction-dock-tooltip">More Coming</div>
+        `;
+        item.addEventListener('click', (e) => {
+          e.stopPropagation();
+          showToast('Custom DragMe reaction pack coming in next drop!', 'normal');
+          dock.remove();
+        });
+      } else {
+        item.innerHTML = `
+          <div class="reaction-dock-icon">
+            ${r.isCrown ? `
+              <svg class="crown-icon" viewBox="0 0 24 24" style="stroke: ${r.color}; fill: ${r.color};">
+                <path d="M4 18h16a1 1 0 0 0 1-1l-2-10-4.5 5-2.5-7-2.5 7L5 7l-2 10a1 1 0 0 0 1 1z" />
+              </svg>
+            ` : r.emoji}
+          </div>
+          <div class="reaction-dock-tooltip">${r.label}</div>
+        `;
+
+        item.addEventListener('click', async (e) => {
+          e.stopPropagation();
+          dock.remove();
+
+          if (!AuthState.currentUser) {
+            return openAuthModal('login');
+          }
+
+          try {
+            const res = await API.toggleLike(post.id, r.id, true);
+            likeBtn.className = `btn-crown-like liked reaction-${r.id} animate-pop`;
+            
+            if (r.isCrown) {
+              likeBtn.innerHTML = `
+                <svg class="crown-icon" viewBox="0 0 24 24">
+                  <path d="M4 18h16a1 1 0 0 0 1-1l-2-10-4.5 5-2.5-7-2.5 7L5 7l-2 10a1 1 0 0 0 1 1z" />
+                </svg>
+                <span class="crown-like-count">${res.like_count}</span>
+              `;
+            } else {
+              likeBtn.innerHTML = `
+                <span class="crown-custom-emoji">${r.emoji}</span>
+                <span class="crown-like-count">${res.like_count}</span>
+              `;
+            }
+
+            this.triggerCrownParticleBurst(wrapper, r.color);
+            showToast(`Reacted with ${r.label}!`, 'success');
+            setTimeout(() => likeBtn.classList.remove('animate-pop'), 500);
+          } catch (err) {
+            showToast(err.message, 'error');
+          }
+        });
+      }
+
+      dock.appendChild(item);
+    });
+
+    wrapper.appendChild(dock);
+
+    // Auto-dismiss on click outside
+    const dismissHandler = (e) => {
+      if (!dock.contains(e.target) && !wrapper.contains(e.target)) {
+        dock.remove();
+        document.removeEventListener('click', dismissHandler);
+        document.removeEventListener('touchstart', dismissHandler);
+      }
+    };
+    setTimeout(() => {
+      document.addEventListener('click', dismissHandler);
+      document.addEventListener('touchstart', dismissHandler);
+    }, 50);
   },
 
   escapeHTML(str) {

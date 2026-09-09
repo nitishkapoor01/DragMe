@@ -110,8 +110,11 @@ const API = {
     });
   },
 
-  async toggleLike(postId) {
-    return this.request(`/api/posts/${postId}/like`, { method: 'POST' });
+  async toggleLike(postId, reactionType = 'crown', switchOnly = false) {
+    return this.request(`/api/posts/${postId}/like`, {
+      method: 'POST',
+      body: JSON.stringify({ reaction_type: reactionType, switch_only: switchOnly })
+    });
   },
 
   async toggleSave(postId) {

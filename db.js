@@ -113,18 +113,24 @@ function initDatabase() {
     );
   `);
 
-  // 4. Post Likes
+  // 4. Post Likes & Signature Crown Reactions
   db.exec(`
     CREATE TABLE IF NOT EXISTS post_likes (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       post_id TEXT NOT NULL,
       user_id TEXT NOT NULL,
+      reaction_type TEXT DEFAULT 'crown',
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       UNIQUE(post_id, user_id),
       FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE,
       FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
     );
   `);
+  try {
+    db.exec(`ALTER TABLE post_likes ADD COLUMN reaction_type TEXT DEFAULT 'crown';`);
+  } catch (e) {
+    // Column already exists
+  }
 
   // 5. Post Saves (Bookmarks)
   db.exec(`

@@ -12,6 +12,7 @@ function getFYPFeed({ userId = null, limit = 20, offset = 0, filterType = null, 
       u.avatar_url as author_avatar,
       u.badge as author_badge,
       (SELECT COUNT(*) FROM post_likes pl WHERE pl.post_id = p.id AND pl.user_id = ?) as has_liked,
+      (SELECT reaction_type FROM post_likes pl WHERE pl.post_id = p.id AND pl.user_id = ?) as user_reaction,
       (SELECT COUNT(*) FROM post_saves ps WHERE ps.post_id = p.id AND ps.user_id = ?) as has_saved,
       (SELECT option_index FROM poll_votes pv WHERE pv.post_id = p.id AND pv.user_id = ?) as user_vote,
       (SELECT COALESCE(AVG(dwell_ms), 0) FROM user_views uv WHERE uv.post_id = p.id) as avg_dwell_ms
@@ -19,7 +20,7 @@ function getFYPFeed({ userId = null, limit = 20, offset = 0, filterType = null, 
     LEFT JOIN users u ON p.user_id = u.id
   `;
 
-  const params = [userId || '', userId || '', userId || ''];
+  const params = [userId || '', userId || '', userId || '', userId || ''];
   const whereClauses = [];
 
   if (filterType === 'confession') {
