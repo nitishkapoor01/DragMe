@@ -80,7 +80,7 @@ const FeedManager = {
       if (data.posts.length === 0 && this.offset === 0) {
         streamContainer.innerHTML = `
           <div class="cyber-card" style="text-align: center; padding: 40px 20px;">
-            <div style="font-size: 2rem; margin-bottom: 10px;">🌌</div>
+            <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="var(--dragme-lime)" stroke-width="1.8" style="margin-bottom: 10px;"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle><line x1="12" y1="2" x2="12" y2="4"></line><line x1="12" y1="20" x2="12" y2="22"></line><line x1="20" y1="12" x2="22" y2="12"></line><line x1="2" y1="12" x2="4" y2="12"></line></svg>
             <h3 style="font-family: var(--font-display); margin-bottom: 8px;">No Signals Found</h3>
             <p style="color: var(--text-secondary); font-size: 0.9rem;">Be the first to broadcast on this frequency.</p>
           </div>

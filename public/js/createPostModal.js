@@ -36,14 +36,38 @@ const CreatePostModal = {
           <div class="modal-body">
             <!-- Format Selector Tabs -->
             <div style="display: flex; gap: 6px; overflow-x: auto; padding-bottom: 12px; margin-bottom: 14px; border-bottom: 1px solid var(--border-subtle);">
-              <button class="feed-tab active" data-type="text">📝 Text</button>
-              <button class="feed-tab" data-type="confession">🔒 Confession</button>
-              <button class="feed-tab" data-type="meme">🖼️ Meme / Image</button>
-              <button class="feed-tab" data-type="video">🎬 Video</button>
-              <button class="feed-tab" data-type="carousel">🎠 Carousel</button>
-              <button class="feed-tab" data-type="poll">📊 Poll</button>
-              <button class="feed-tab" data-type="voice">🎙️ Voice</button>
-              <button class="feed-tab" data-type="hangout_invite">⚡ Hangout</button>
+              <button class="feed-tab active" data-type="text">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: -2px; margin-right: 3px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                Text
+              </button>
+              <button class="feed-tab" data-type="confession">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: -2px; margin-right: 3px;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                Confession
+              </button>
+              <button class="feed-tab" data-type="meme">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: -2px; margin-right: 3px;"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                Meme / Image
+              </button>
+              <button class="feed-tab" data-type="video">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: -2px; margin-right: 3px;"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg>
+                Video
+              </button>
+              <button class="feed-tab" data-type="carousel">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: -2px; margin-right: 3px;"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"></rect><polyline points="17 2 12 7 7 2"></polyline></svg>
+                Carousel
+              </button>
+              <button class="feed-tab" data-type="poll">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: -2px; margin-right: 3px;"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+                Poll
+              </button>
+              <button class="feed-tab" data-type="voice">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: -2px; margin-right: 3px;"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+                Voice
+              </button>
+              <button class="feed-tab" data-type="hangout_invite">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: -2px; margin-right: 3px;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                Hangout
+              </button>
             </div>
 
             <form id="create-post-form" style="display: flex; flex-direction: column; gap: 14px;">
@@ -58,7 +82,8 @@ const CreatePostModal = {
                     Public
                   </button>
                   <button type="button" class="identity-btn ${AuthState.currentMode === 'ghost' ? 'active ghost-mode' : ''}" id="modal-identity-ghost">
-                    🎭 Ghost
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: -2px; margin-right: 3px;"><path d="M9 10h.01M15 10h.01M12 2a8 8 0 0 0-8 8v12l3-3 2.5 2.5L12 19l2.5 2.5L17 19l3 3V10a8 8 0 0 0-8-8z"/></svg>
+                    Ghost
                   </button>
                 </div>
               </div>

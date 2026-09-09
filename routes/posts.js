@@ -202,13 +202,13 @@ router.post('/:id/like', requireAuth, rateLimiter({ windowMs: 60000, max: 60 }),
     if (post.user_id !== userId) {
       const notifId = `notif_${Date.now()}_${crypto.randomBytes(3).toString('hex')}`;
       const reactionTitles = {
-        crown: 'crowned your post 👑',
-        hot: 'reacted 🔥 Hot to your post',
-        insight: 'reacted 🧠 Mind Blown to your post',
-        relatable: 'reacted 😂 So True to your post',
-        brutal: 'reacted 💀 Savage to your post'
+        crown: 'crowned your post',
+        hot: 'reacted Hot to your post',
+        insight: 'reacted Mind Blown to your post',
+        relatable: 'reacted So True to your post',
+        brutal: 'reacted Savage to your post'
       };
-      const title = reactionTitles[sanitizedReaction] || 'crowned your post 👑';
+      const title = reactionTitles[sanitizedReaction] || 'crowned your post';
       db.prepare(`
         INSERT INTO notifications (id, user_id, sender_id, sender_name, sender_avatar, type, target_id, title, message)
         VALUES (?, ?, ?, ?, ?, 'like', ?, 'Crown Reaction!', ?)

@@ -39,13 +39,15 @@ const MatchmakerManager = {
       overlay.className = 'matchmaker-full-overlay';
       overlay.innerHTML = `
         <div style="position: absolute; top: 20px; right: 24px;">
-          <button class="icon-btn" id="btn-close-matchmaker">✕</button>
+          <button class="icon-btn" id="btn-close-matchmaker">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
         </div>
 
         <div id="matchmaker-radar-view" style="display: flex; flex-direction: column; align-items: center; text-align: center;">
           <div class="radar-spinner-box">
             <div class="radar-sweep"></div>
-            <div style="font-size: 2rem;">⚡</div>
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--dragme-lime)" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
           </div>
           <h2 style="font-family: var(--font-display); font-size: 1.5rem; margin-bottom: 8px;">1-on-1 Instant Hangout</h2>
           <p id="matchmaker-status-text" style="color: var(--text-secondary); font-size: 0.9rem; max-width: 380px;">Connecting to matchmaking frequency...</p>

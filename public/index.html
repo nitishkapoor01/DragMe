@@ -34,7 +34,7 @@
   <header class="navbar">
     <div class="nav-brand">
       <a href="#home" class="brand-logo" id="logo-home-link">
-        DRAGME <span class="logo-crown">👑</span>
+        DRAGME <svg class="logo-crown-svg" width="19" height="19" viewBox="0 0 24 24" fill="#C6FF00" stroke="#C6FF00" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 18h16a1 1 0 0 0 1-1l-2-10-4.5 5-2.5-7-2.5 7L5 7l-2 10a1 1 0 0 0 1 1z"/></svg>
       </a>
     </div>
 
@@ -135,16 +135,16 @@
 
         <div class="active-rooms-list">
           <div class="active-room-item" data-room-topic="fitness">
-            <span class="room-icon">⚔️</span> Fitness & Health
+            <span class="room-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 5v14M18 5v14M2 9v6M22 9v6M6 12h12"/></svg></span> Fitness & Health
           </div>
           <div class="active-room-item" data-room-topic="gaming">
-            <span class="room-icon">🎮</span> Gaming & Esports
+            <span class="room-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="4"></rect><path d="M6 12h4M8 10v4M15 11h.01M18 13h.01"></path></svg></span> Gaming & Esports
           </div>
           <div class="active-room-item" data-room-topic="movies">
-            <span class="room-icon">🎬</span> Movie Buffs
+            <span class="room-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect><line x1="7" y1="2" x2="7" y2="22"></line><line x1="17" y1="2" x2="17" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line><line x1="2" y1="7" x2="7" y2="7"></line><line x1="2" y1="17" x2="7" y2="17"></line><line x1="17" y1="17" x2="22" y2="17"></line><line x1="17" y1="7" x2="22" y2="7"></line></svg></span> Movie Buffs
           </div>
           <div class="active-room-item" data-room-topic="design">
-            <span class="room-icon">🎨</span> Design & UI/UX
+            <span class="room-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a7 7 0 0 0 7 7c0 2-2 3-2 3s-1 1-1 3c0 2-2 3-4 3a7 7 0 0 1-7-7c0-4 3-9 7-9z"></path></svg></span> Design & UI/UX
           </div>
           <a href="#rooms" class="view-all-link">View all →</a>
         </div>
@@ -167,7 +167,9 @@
       <div class="feed-tabs-bar">
         <div class="feed-tabs-left">
           <button class="feed-tab active" data-filter="all">For You</button>
-          <button class="feed-tab" data-filter="trending">🔥 Trending</button>
+          <button class="feed-tab" data-filter="trending">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" style="vertical-align: -2px; margin-right: 3px;"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg> Trending
+          </button>
           <button class="feed-tab" data-filter="new">New</button>
           <button class="feed-tab" data-filter="following">Following</button>
           <button class="feed-tab" data-filter="communities">Communities</button>
@@ -193,7 +195,7 @@
       <!-- Widget 1: Trending Drags -->
       <div class="widget-box">
         <div class="widget-header">
-          <h4><span style="color: var(--neon-red);">🔥</span> TRENDING DRAGS</h4>
+          <h4><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" style="vertical-align: -2px; margin-right: 4px;"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg> TRENDING DRAGS</h4>
           <a href="#trending" class="widget-view-all">View all</a>
         </div>
         <div class="trending-list" id="widget-trending-list">
@@ -228,7 +230,7 @@
       <!-- Widget 2: Most Cooked Today -->
       <div class="widget-box">
         <div class="widget-header">
-          <h4><span style="color: var(--neon-flame);">🔥</span> MOST COOKED TODAY</h4>
+          <h4><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" style="vertical-align: -2px; margin-right: 4px;"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg> MOST COOKED TODAY</h4>
           <a href="#cooked" class="widget-view-all">View all</a>
         </div>
         <div class="cooked-list" id="widget-cooked-list">

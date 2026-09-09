@@ -138,7 +138,7 @@ const HangoutManager = {
         </button>
 
         <button class="hangout-ctrl-btn ${this.handRaised ? 'active' : ''}" id="btn-toggle-hand" title="Raise Hand">
-          ✋
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v2M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v8M6 14v-1a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v3a7 7 0 0 0 7 7h3a7 7 0 0 0 7-7v-5a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v1"></path></svg>
         </button>
 
         <button class="hangout-ctrl-btn leave-btn" id="btn-leave-room-bottom" title="Leave Lounge">

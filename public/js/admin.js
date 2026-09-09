@@ -19,8 +19,13 @@ const AdminManager = {
       modal.innerHTML = `
         <div class="modal-window" style="max-width: 720px;">
           <div class="modal-header">
-            <h3 style="font-family: var(--font-display); font-size: 1.25rem;">🛡️ DragMe Security & Moderation Console</h3>
-            <button class="icon-btn" id="btn-admin-close">✕</button>
+            <h3 style="font-family: var(--font-display); font-size: 1.25rem; display: flex; align-items: center; gap: 8px;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--dragme-lime)" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+              DragMe Security & Moderation Console
+            </h3>
+            <button class="icon-btn" id="btn-admin-close">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
           </div>
           <div class="modal-body">
             <!-- Platform Metrics Grid -->

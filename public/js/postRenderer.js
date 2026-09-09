@@ -75,13 +75,7 @@ const PostRenderer = {
           <!-- DragMe Signature Crown Like Interaction -->
           <div class="crown-like-wrapper" data-post-id="${post.id}">
             <button class="btn-crown-like ${post.has_liked ? 'liked' : ''} ${post.user_reaction && post.user_reaction !== 'crown' ? 'reaction-' + post.user_reaction : ''}" data-post-id="${post.id}" title="Crown Like (Press & Hold for Reactions)">
-              ${post.user_reaction && post.user_reaction !== 'crown' ? `
-                <span class="crown-custom-emoji">${post.user_reaction === 'hot' ? '🔥' : post.user_reaction === 'insight' ? '🧠' : post.user_reaction === 'relatable' ? '😂' : '💀'}</span>
-              ` : `
-                <svg class="crown-icon" viewBox="0 0 24 24">
-                  <path d="M4 18h16a1 1 0 0 0 1-1l-2-10-4.5 5-2.5-7-2.5 7L5 7l-2 10a1 1 0 0 0 1 1z" />
-                </svg>
-              `}
+              ${this.getReactionIconSVG(post.user_reaction || 'crown')}
               <span class="crown-like-count">${post.like_count || 0}</span>
             </button>
           </div>
@@ -110,7 +104,8 @@ const PostRenderer = {
               @${AuthState.currentUser ? AuthState.currentUser.username : 'You'}
             </button>
             <button class="identity-btn ${AuthState.currentMode === 'ghost' ? 'active ghost-mode' : ''} comment-mode-toggle-ghost" data-post-id="${post.id}">
-              🎭 Ghost
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: -2px; margin-right: 3px;"><path d="M9 10h.01M15 10h.01M12 2a8 8 0 0 0-8 8v12l3-3 2.5 2.5L12 19l2.5 2.5L17 19l3 3V10a8 8 0 0 0-8-8z"/></svg>
+              Ghost
             </button>
           </div>
         </div>
@@ -643,18 +638,35 @@ const PostRenderer = {
     setTimeout(() => container.remove(), 600);
   },
 
+  // SVG Reaction Icons Registry (Zero Emoji Policy)
+  getReactionIconSVG(reactionType, size = 22) {
+    switch (reactionType) {
+      case 'hot':
+        return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="#FF5722" stroke-width="2"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>`;
+      case 'insight':
+        return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="#D946EF" stroke-width="2"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 4.44-2.54z"></path><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-4.44-2.54z"></path></svg>`;
+      case 'relatable':
+        return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="#FACC15" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M8 14s1.5 2 4 2 4-2 4-2"></path><line x1="9" y1="9" x2="9.01" y2="9"></line><line x1="15" y1="9" x2="15.01" y2="9"></line></svg>`;
+      case 'brutal':
+        return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="#E2E8F0" stroke-width="2"><circle cx="9" cy="12" r="1"></circle><circle cx="15" cy="12" r="1"></circle><path d="M8 20v2h8v-2M12 2a9 9 0 0 0-9 9c0 3.5 2 6.5 5 7.9V20h8v-1.1c3-1.4 5-4.4 5-7.9a9 9 0 0 0-9-9z"></path></svg>`;
+      case 'crown':
+      default:
+        return `<svg class="crown-icon" viewBox="0 0 24 24"><path d="M4 18h16a1 1 0 0 0 1-1l-2-10-4.5 5-2.5-7-2.5 7L5 7l-2 10a1 1 0 0 0 1 1z" /></svg>`;
+    }
+  },
+
   // 4. Long Press Reactions Flyout Dock
   openReactionDock(wrapper, post, likeBtn, countEl) {
     // Close existing open docks
     document.querySelectorAll('.crown-reaction-dock').forEach(d => d.remove());
 
     const reactions = [
-      { id: 'crown', label: 'Crown Like', emoji: '👑', color: '#C6FF00', isCrown: true },
-      { id: 'hot', label: 'Hot This!', emoji: '🔥', color: '#FF5722' },
-      { id: 'insight', label: 'Mind = Blown', emoji: '🧠', color: '#D946EF' },
-      { id: 'relatable', label: 'So True', emoji: '😂', color: '#FACC15' },
-      { id: 'brutal', label: 'Savage', emoji: '💀', color: '#E2E8F0' },
-      { id: 'more', label: 'More Coming', emoji: '+', isMore: true }
+      { id: 'crown', label: 'Crown Like', color: '#C6FF00' },
+      { id: 'hot', label: 'Hot This!', color: '#FF5722' },
+      { id: 'insight', label: 'Mind = Blown', color: '#D946EF' },
+      { id: 'relatable', label: 'So True', color: '#FACC15' },
+      { id: 'brutal', label: 'Savage', color: '#E2E8F0' },
+      { id: 'more', label: 'More Coming', isMore: true }
     ];
 
     const dock = document.createElement('div');
@@ -678,11 +690,7 @@ const PostRenderer = {
       } else {
         item.innerHTML = `
           <div class="reaction-dock-icon">
-            ${r.isCrown ? `
-              <svg class="crown-icon" viewBox="0 0 24 24" style="stroke: ${r.color}; fill: ${r.color};">
-                <path d="M4 18h16a1 1 0 0 0 1-1l-2-10-4.5 5-2.5-7-2.5 7L5 7l-2 10a1 1 0 0 0 1 1z" />
-              </svg>
-            ` : r.emoji}
+            ${this.getReactionIconSVG(r.id, 22)}
           </div>
           <div class="reaction-dock-tooltip">${r.label}</div>
         `;
@@ -698,20 +706,10 @@ const PostRenderer = {
           try {
             const res = await API.toggleLike(post.id, r.id, true);
             likeBtn.className = `btn-crown-like liked reaction-${r.id} animate-pop`;
-            
-            if (r.isCrown) {
-              likeBtn.innerHTML = `
-                <svg class="crown-icon" viewBox="0 0 24 24">
-                  <path d="M4 18h16a1 1 0 0 0 1-1l-2-10-4.5 5-2.5-7-2.5 7L5 7l-2 10a1 1 0 0 0 1 1z" />
-                </svg>
-                <span class="crown-like-count">${res.like_count}</span>
-              `;
-            } else {
-              likeBtn.innerHTML = `
-                <span class="crown-custom-emoji">${r.emoji}</span>
-                <span class="crown-like-count">${res.like_count}</span>
-              `;
-            }
+            likeBtn.innerHTML = `
+              ${this.getReactionIconSVG(r.id)}
+              <span class="crown-like-count">${res.like_count}</span>
+            `;
 
             this.triggerCrownParticleBurst(wrapper, r.color);
             showToast(`Reacted with ${r.label}!`, 'success');

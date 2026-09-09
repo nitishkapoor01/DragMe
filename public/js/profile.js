@@ -47,9 +47,9 @@ const ProfileManager = {
         display_name: 'DragMe Official',
         avatar_url: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=200',
         banner_url: 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=1400',
-        bio: '👑 Official DragMe Founder & Product Team. Building the rawest space on the internet — no filters, just fire. Roadmap, live feature polls & platform updates.',
+        bio: 'Official DragMe Founder & Product Team. Building the rawest space on the internet — no filters, just fire. Roadmap, live feature polls & platform updates.',
         location: 'Everywhere',
-        custom_badge: '👑 FOUNDER',
+        custom_badge: 'FOUNDER',
         badge: 'Senior Roaster',
         reputation_score: 0,
         cooked_ratio: 0,
@@ -99,7 +99,7 @@ const ProfileManager = {
     const avatarImg = user.avatar_url || defaultAvatar;
     const displayName = user.display_name || user.username || 'DragMe Official';
     const locationText = user.location || 'Everywhere';
-    const bioText = user.bio || '👑 Official DragMe Founder & Product Team. Building the rawest space on the internet — no filters, just fire. Roadmap, live feature polls & platform updates.';
+    const bioText = user.bio || 'Official DragMe Founder & Product Team. Building the rawest space on the internet — no filters, just fire. Roadmap, live feature polls & platform updates.';
     
     // Format joined date (e.g. September 2026)
     let joinedDate = 'September 2026';
@@ -152,7 +152,11 @@ const ProfileManager = {
                   </button>
                 ` : `
                   <button class="btn-edit-profile-main ${isFollowing ? 'following' : ''}" id="btn-toggle-follow-user" style="${isFollowing ? 'background: #222638;' : 'background: var(--dragme-lime); color: #000;'}">
-                    ${isFollowing ? '✓ Following' : '+ Follow'}
+                    ${isFollowing ? `
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align: -2px; margin-right: 4px;"><polyline points="20 6 9 17 4 12"></polyline></svg> Following
+                    ` : `
+                      + Follow
+                    `}
                   </button>
                   <button class="profile-icon-action" id="btn-profile-share" title="Share Profile">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg>
@@ -167,7 +171,10 @@ const ProfileManager = {
               <span class="profile-verified-badge" title="Verified Creator & Founder">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="#a3e635"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
               </span>
-              <span class="badge-founder-gold">${user.custom_badge || '👑 FOUNDER'}</span>
+              <span class="badge-founder-gold">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="#000" stroke="#000" stroke-width="1.5" style="vertical-align: -1px; margin-right: 3px;"><path d="M4 18h16a1 1 0 0 0 1-1l-2-10-4.5 5-2.5-7-2.5 7L5 7l-2 10a1 1 0 0 0 1 1z"/></svg>
+                ${(user.custom_badge || 'FOUNDER').replace('👑', '').trim()}
+              </span>
               <span class="badge-senior-roaster">${user.badge || 'Senior Roaster'}</span>
             </div>
 
@@ -221,7 +228,7 @@ const ProfileManager = {
           <button class="profile-tab-btn ${this.currentTab === 'replies' ? 'active' : ''}" data-tab="replies">Replies</button>
           ${isSelf ? `
             <button class="profile-tab-btn ${this.currentTab === 'saved' ? 'active' : ''}" data-tab="saved">
-              🔒 Only You
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: -2px; margin-right: 4px;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> Only You
             </button>
           ` : ''}
         </div>
@@ -291,7 +298,10 @@ const ProfileManager = {
       <!-- Widget 1: Profile Highlights -->
       <div class="widget-box">
         <div class="widget-header">
-          <h4 style="color: #facc15;">✨ PROFILE HIGHLIGHTS</h4>
+          <h4 style="color: #facc15; display: flex; align-items: center; gap: 6px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#facc15" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+            PROFILE HIGHLIGHTS
+          </h4>
         </div>
         <div style="display: flex; flex-direction: column; gap: 4px; padding: 4px 0;">
           <div class="profile-highlight-row">
@@ -335,19 +345,27 @@ const ProfileManager = {
         </div>
         <div class="badges-grid">
           <div class="badge-card-mini" title="Top Roaster Award">
-            <span class="badge-card-icon">🔥</span>
+            <span class="badge-card-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
+            </span>
             <span class="badge-card-name">Top Roaster</span>
           </div>
           <div class="badge-card-mini" title="Battle Champion">
-            <span class="badge-card-icon">⚡</span>
+            <span class="badge-card-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a3e635" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+            </span>
             <span class="badge-card-name">Battle Ch...</span>
           </div>
           <div class="badge-card-mini" title="Great Critic">
-            <span class="badge-card-icon">⚖️</span>
+            <span class="badge-card-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2"><path d="M12 3v18M6 8l6-5 6 5M6 8v7a3 3 0 0 0 6 0V8M18 8v7a3 3 0 0 0 6 0V8"></path></svg>
+            </span>
             <span class="badge-card-name">Great Critic</span>
           </div>
           <div class="badge-card-mini" title="Problem Solver">
-            <span class="badge-card-icon">🪪</span>
+            <span class="badge-card-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#c084fc" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"></rect><circle cx="9" cy="10" r="2"></circle><line x1="15" y1="8" x2="17" y2="8"></line><line x1="15" y1="12" x2="17" y2="12"></line></svg>
+            </span>
             <span class="badge-card-name">Problem ...</span>
           </div>
         </div>
@@ -357,7 +375,10 @@ const ProfileManager = {
       ${isSelf ? `
         <div class="widget-box">
           <div class="widget-header">
-            <h4 style="color: #facc15;"><span style="font-size: 0.85rem;">🔒</span> ONLY YOU CAN SEE</h4>
+            <h4 style="color: #facc15; display: flex; align-items: center; gap: 6px;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#facc15" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+              ONLY YOU CAN SEE
+            </h4>
           </div>
           <div style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 12px; margin-top: -6px;">
             Private owner-only activity
@@ -365,24 +386,24 @@ const ProfileManager = {
 
           <div class="private-feature-item" id="btn-sidebar-recent-activity">
             <div class="private-feature-left">
-              <span style="font-size: 1.1rem; color: var(--dragme-lime);">🕒</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--dragme-lime)" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
               <div>
                 <div class="private-feature-title">Recent Activity</div>
                 <div class="private-feature-sub">Your private activity timeline</div>
               </div>
             </div>
-            <span style="color: var(--text-muted); font-size: 0.8rem;">🔒</span>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
           </div>
 
           <div class="private-feature-item" id="btn-sidebar-saved-posts">
             <div class="private-feature-left">
-              <span style="font-size: 1.1rem; color: #facc15;">🔖</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#facc15" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
               <div>
                 <div class="private-feature-title">Saved</div>
                 <div class="private-feature-sub">Posts, rooms & content you saved</div>
               </div>
             </div>
-            <span style="color: var(--text-muted); font-size: 0.8rem;">🔒</span>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
           </div>
         </div>
       ` : ''}
@@ -417,7 +438,7 @@ const ProfileManager = {
         if (!data.posts || data.posts.length === 0) {
           stream.innerHTML = `
             <div class="empty-state-box" style="padding: 40px 20px; text-align: center; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 14px;">
-              <span style="font-size: 2.2rem;">🔖</span>
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#facc15" stroke-width="1.8" style="margin-bottom: 8px;"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
               <h3 style="color: #fff; margin-top: 10px; font-size: 1.1rem;">No Saved Posts Yet</h3>
               <p style="color: var(--text-muted); font-size: 0.86rem; margin-top: 6px;">Click the bookmark icon on any post in your feed to save it for later.</p>
             </div>
@@ -437,7 +458,7 @@ const ProfileManager = {
         if (!data.rooms || data.rooms.length === 0) {
           stream.innerHTML = `
             <div class="empty-state-box" style="padding: 40px 20px; text-align: center; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 14px;">
-              <span style="font-size: 2.2rem;">🎙️</span>
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="1.8" style="margin-bottom: 8px;"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
               <h3 style="color: #fff; margin-top: 10px; font-size: 1.1rem;">No Active Rooms Hosted</h3>
               <p style="color: var(--text-muted); font-size: 0.86rem; margin-top: 6px;">Start a live audio hangout room or voice discussion to invite the community.</p>
             </div>
@@ -471,7 +492,7 @@ const ProfileManager = {
         if (!data.comments || data.comments.length === 0) {
           stream.innerHTML = `
             <div class="empty-state-box" style="padding: 40px 20px; text-align: center; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 14px;">
-              <span style="font-size: 2.2rem;">💬</span>
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="1.8" style="margin-bottom: 8px;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
               <h3 style="color: #fff; margin-top: 10px; font-size: 1.1rem;">No Replies Yet</h3>
               <p style="color: var(--text-muted); font-size: 0.86rem; margin-top: 6px;">Comment on community confessions and threads to build discussion karma.</p>
             </div>
@@ -501,7 +522,7 @@ const ProfileManager = {
       if (!data.posts || data.posts.length === 0) {
         stream.innerHTML = `
           <div class="empty-state-box" style="padding: 40px 20px; text-align: center; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 14px;">
-            <span style="font-size: 2.2rem;">🚀</span>
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="1.8" style="margin-bottom: 8px;"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"></path><path d="M12 15l-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"></path></svg>
             <h3 style="color: #fff; margin-top: 10px; font-size: 1.1rem;">No ${tab} Published Yet</h3>
             <p style="color: var(--text-muted); font-size: 0.86rem; margin-top: 6px;">Put your first thoughts, confessions, memes, or polls out into the realm.</p>
           </div>
