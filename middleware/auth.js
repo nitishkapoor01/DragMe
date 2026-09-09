@@ -25,7 +25,12 @@ function optionalAuth(req, res, next) {
   const token = authHeader.split(' ')[1];
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
-    const user = db.prepare('SELECT id, username, email, avatar_url, banner_url, bio, role, badge, karma, hangout_hours, is_banned FROM users WHERE id = ?').get(decoded.id);
+    const user = db.prepare(`
+      SELECT id, username, display_name, email, avatar_url, banner_url, bio, location,
+             role, badge, custom_badge, verified, karma, reputation_score, cooked_ratio,
+             judgment_accuracy, rank_title, roast_level, hangout_hours, created_at, is_banned
+      FROM users WHERE id = ?
+    `).get(decoded.id);
     if (user && !user.is_banned) {
       req.user = user;
     } else {

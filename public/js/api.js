@@ -59,11 +59,35 @@ const API = {
     return this.request('/api/auth/me');
   },
 
+  async getProfile(username) {
+    return this.request(`/api/auth/profile/${encodeURIComponent(username)}`);
+  },
+
   async updateProfile(profileData) {
     return this.request('/api/auth/profile', {
       method: 'PUT',
       body: JSON.stringify(profileData)
     });
+  },
+
+  async followUser(userId) {
+    return this.request(`/api/auth/follow/${userId}`, { method: 'POST' });
+  },
+
+  async unfollowUser(userId) {
+    return this.request(`/api/auth/follow/${userId}`, { method: 'DELETE' });
+  },
+
+  async getUserPosts(userId, tab = 'posts') {
+    return this.request(`/api/posts/user/${userId}?tab=${tab}`);
+  },
+
+  async getUserRooms(userId) {
+    return this.request(`/api/rooms/user/${userId}`);
+  },
+
+  async getSavedPosts() {
+    return this.request('/api/posts/user/saved');
   },
 
   async getAnonymousPersona(seed) {

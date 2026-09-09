@@ -133,6 +133,43 @@ router.get('/:id', optionalAuth, (req, res) => {
   });
 });
 
+// Get Rooms hosted by User
+router.get('/user/:userId', optionalAuth, (req, res) => {
+  const userId = req.params.userId;
+  const rooms = db.prepare(`
+    SELECT 
+      r.*,
+      u.username as owner_username,
+      u.avatar_url as owner_avatar,
+      u.badge as owner_badge
+    FROM rooms r
+    LEFT JOIN users u ON r.owner_id = u.id
+    WHERE r.owner_id = ?
+    ORDER BY r.created_at DESC
+  `).all(userId);
+
+  const formatted = rooms.map(r => ({
+    id: r.id,
+    title: r.title,
+    topic: r.topic,
+    description: r.description,
+    is_private: Boolean(r.is_private),
+    is_active: Boolean(r.is_active),
+    max_participants: r.max_participants,
+    participant_count: r.participant_count,
+    tags: JSON.parse(r.tags || '[]'),
+    created_at: r.created_at,
+    owner: {
+      id: r.owner_id,
+      username: r.owner_username || 'Host',
+      avatar_url: r.owner_avatar || '',
+      badge: r.owner_badge || 'Host'
+    }
+  }));
+
+  return res.json({ rooms: formatted });
+});
+
 // Close / Delete Room (Owner or Moderator/Admin)
 router.delete('/:id', requireAuth, (req, res) => {
   const roomId = req.params.id;
@@ -151,3 +188,4 @@ router.delete('/:id', requireAuth, (req, res) => {
 });
 
 module.exports = router;
+

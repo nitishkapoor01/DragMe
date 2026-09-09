@@ -82,16 +82,40 @@ const AppRouter = {
     });
   },
 
-  navigate(view) {
+    // Bottom profile card click
+    document.getElementById('sidebar-profile-card')?.addEventListener('click', () => {
+      this.navigate('profile');
+    });
+
+    // Hash routing listener
+    window.addEventListener('hashchange', () => {
+      const hash = window.location.hash.replace('#', '');
+      if (hash.startsWith('profile')) {
+        const parts = hash.split('/');
+        const username = parts[1] || null;
+        this.navigate('profile', username);
+      } else if (hash === 'home' || hash === '') {
+        this.navigate('home');
+      } else if (hash === 'confessions') {
+        this.navigate('confessions');
+      }
+    });
+  },
+
+  navigate(view, param = null) {
     this.currentView = view;
     document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
     
     if (view === 'home') {
       document.getElementById('nav-item-home')?.classList.add('active');
+      ProfileManager.restoreFeedView();
+      FeedManager.loadFeed(true);
     } else if (view === 'confessions') {
       document.getElementById('nav-item-confessions')?.classList.add('active');
+      ProfileManager.restoreFeedView();
+      document.querySelector('.feed-tab[data-filter="confession"]')?.click();
     } else if (view === 'profile') {
-      ProfileManager.openProfileModal();
+      ProfileManager.openProfile(param);
     }
   }
 };

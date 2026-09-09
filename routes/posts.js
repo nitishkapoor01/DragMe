@@ -307,6 +307,84 @@ router.post('/:id/view', optionalAuth, (req, res) => {
   return res.json({ success: true });
 });
 
+// Get Saved Posts (Owner private only)
+router.get('/user/saved', requireAuth, (req, res) => {
+  const currentUserId = req.user.id;
+  const posts = db.prepare(`
+    SELECT 
+      p.*,
+      u.username as author_username,
+      u.avatar_url as author_avatar,
+      u.badge as author_badge,
+      1 as has_saved,
+      (SELECT COUNT(*) FROM post_likes pl WHERE pl.post_id = p.id AND pl.user_id = ?) as has_liked
+    FROM post_saves ps
+    JOIN posts p ON ps.post_id = p.id
+    LEFT JOIN users u ON p.user_id = u.id
+    WHERE ps.user_id = ?
+    ORDER BY ps.created_at DESC
+    LIMIT 50
+  `).all(currentUserId, currentUserId);
+
+  const cleanPosts = posts.map(p => scrubPostPayload(p, currentUserId));
+  return res.json({ posts: cleanPosts });
+});
+
+// Get User's Content for Profile Tabs (Posts, Media, Replies)
+router.get('/user/:userId', optionalAuth, (req, res) => {
+  const targetUserId = req.params.userId;
+  const tab = req.query.tab || 'posts'; // 'posts', 'media', 'replies', 'confessions'
+  const currentUserId = req.user ? req.user.id : null;
+  const isOwner = currentUserId === targetUserId;
+
+  if (tab === 'replies') {
+    const comments = db.prepare(`
+      SELECT 
+        c.*,
+        p.title as post_title,
+        p.content as post_content,
+        u.username as author_username,
+        u.avatar_url as author_avatar
+      FROM comments c
+      JOIN posts p ON c.post_id = p.id
+      LEFT JOIN users u ON c.user_id = u.id
+      WHERE c.user_id = ? ${isOwner ? '' : 'AND c.is_anonymous = 0'}
+      ORDER BY c.created_at DESC
+      LIMIT 50
+    `).all(targetUserId);
+
+    return res.json({ comments });
+  }
+
+  let query = `
+    SELECT 
+      p.*,
+      u.username as author_username,
+      u.avatar_url as author_avatar,
+      u.badge as author_badge,
+      (SELECT COUNT(*) FROM post_likes pl WHERE pl.post_id = p.id AND pl.user_id = ?) as has_liked,
+      (SELECT COUNT(*) FROM post_saves ps WHERE ps.post_id = p.id AND ps.user_id = ?) as has_saved
+    FROM posts p
+    LEFT JOIN users u ON p.user_id = u.id
+    WHERE p.user_id = ?
+  `;
+
+  if (!isOwner) {
+    query += ' AND p.is_anonymous = 0';
+  }
+
+  if (tab === 'media') {
+    query += " AND (p.post_type IN ('meme', 'video', 'carousel') OR p.media_urls != '[]')";
+  }
+
+  query += ' ORDER BY p.created_at DESC LIMIT 50';
+
+  const posts = db.prepare(query).all(currentUserId || '', currentUserId || '', targetUserId);
+  const cleanPosts = posts.map(p => scrubPostPayload(p, currentUserId));
+
+  return res.json({ posts: cleanPosts });
+});
+
 // Delete Post (Owner or Admin/Moderator only)
 router.delete('/:id', requireAuth, (req, res) => {
   const postId = req.params.id;

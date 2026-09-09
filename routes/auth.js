@@ -89,9 +89,17 @@ router.post('/login', rateLimiter({ windowMs: 60000, max: 15 }), (req, res) => {
     avatar_url: user.avatar_url,
     banner_url: user.banner_url,
     bio: user.bio,
+    location: user.location || 'Everywhere',
     role: user.role,
     badge: user.badge,
+    custom_badge: user.custom_badge || '👑 FOUNDER',
+    verified: user.verified || 0,
     karma: user.karma,
+    reputation_score: user.reputation_score || 0,
+    cooked_ratio: user.cooked_ratio || 0,
+    judgment_accuracy: user.judgment_accuracy || 92,
+    rank_title: user.rank_title || '#143 Senior Roaster',
+    roast_level: user.roast_level || 'NOVICE ROASTER',
     hangout_hours: user.hangout_hours
   };
 
@@ -102,18 +110,34 @@ router.post('/login', rateLimiter({ windowMs: 60000, max: 15 }), (req, res) => {
   });
 });
 
+// Helper function to build user stats
+function getUserStats(userId) {
+  const postCount = db.prepare('SELECT COUNT(*) as count FROM posts WHERE user_id = ? AND is_anonymous = 0').get(userId).count;
+  const confessionCount = db.prepare('SELECT COUNT(*) as count FROM posts WHERE user_id = ? AND is_anonymous = 1').get(userId).count;
+  const reactionsReceived = db.prepare('SELECT COALESCE(SUM(like_count), 0) as total FROM posts WHERE user_id = ?').get(userId).total;
+  const savesCount = db.prepare('SELECT COUNT(*) as count FROM post_saves WHERE user_id = ?').get(userId).count;
+  const followersCount = db.prepare('SELECT COUNT(*) as count FROM user_follows WHERE following_id = ?').get(userId).count;
+  const followingCount = db.prepare('SELECT COUNT(*) as count FROM user_follows WHERE follower_id = ?').get(userId).count;
+  const roomsCount = db.prepare('SELECT COUNT(*) as count FROM rooms WHERE owner_id = ?').get(userId).count;
+
+  return {
+    post_count: postCount,
+    confession_count: confessionCount,
+    followers_count: followersCount,
+    following_count: followingCount,
+    rooms_count: roomsCount,
+    reactions_count: reactionsReceived,
+    saved_posts_count: savesCount
+  };
+}
+
 // Get Current User (Me)
 router.get('/me', optionalAuth, (req, res) => {
   if (!req.user) {
     return res.json({ user: null });
   }
 
-  const stats = {
-    post_count: db.prepare('SELECT COUNT(*) as count FROM posts WHERE user_id = ?').get(req.user.id).count,
-    confession_count: db.prepare('SELECT COUNT(*) as count FROM posts WHERE user_id = ? AND is_anonymous = 1').get(req.user.id).count,
-    likes_received: db.prepare('SELECT COALESCE(SUM(like_count), 0) as total FROM posts WHERE user_id = ?').get(req.user.id).total,
-    saved_posts_count: db.prepare('SELECT COUNT(*) as count FROM post_saves WHERE user_id = ?').get(req.user.id).count
-  };
+  const stats = getUserStats(req.user.id);
 
   return res.json({
     user: req.user,
@@ -121,29 +145,133 @@ router.get('/me', optionalAuth, (req, res) => {
   });
 });
 
+// Get Public User Profile by Username
+router.get('/profile/:username', optionalAuth, (req, res) => {
+  const username = req.params.username;
+  const targetUser = db.prepare(`
+    SELECT id, username, display_name, avatar_url, banner_url, bio, location,
+           role, badge, custom_badge, verified, karma, reputation_score, cooked_ratio,
+           judgment_accuracy, rank_title, roast_level, hangout_hours, created_at
+    FROM users 
+    WHERE LOWER(username) = LOWER(?) AND is_banned = 0
+  `).get(username);
+
+  if (!targetUser) {
+    return res.status(404).json({ error: 'User not found.' });
+  }
+
+  const stats = getUserStats(targetUser.id);
+  
+  let isFollowing = false;
+  let isSelf = false;
+  if (req.user) {
+    isSelf = req.user.id === targetUser.id;
+    if (!isSelf) {
+      const follow = db.prepare('SELECT id FROM user_follows WHERE follower_id = ? AND following_id = ?').get(req.user.id, targetUser.id);
+      isFollowing = !!follow;
+    }
+  }
+
+  return res.json({
+    user: targetUser,
+    stats,
+    is_following: isFollowing,
+    is_self: isSelf
+  });
+});
+
 // Update Profile
 router.put('/profile', requireAuth, (req, res) => {
-  const { bio, avatar_url, banner_url } = req.body;
+  const { display_name, bio, location, avatar_url, banner_url } = req.body;
 
   try {
     db.prepare(`
       UPDATE users 
-      SET bio = COALESCE(?, bio),
+      SET display_name = COALESCE(?, display_name),
+          bio = COALESCE(?, bio),
+          location = COALESCE(?, location),
           avatar_url = COALESCE(?, avatar_url),
           banner_url = COALESCE(?, banner_url),
           updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
-    `).run(bio !== undefined ? bio.substring(0, 300) : null, avatar_url || null, banner_url || null, req.user.id);
+    `).run(
+      display_name !== undefined ? display_name.trim().substring(0, 50) : null,
+      bio !== undefined ? bio.trim().substring(0, 500) : null,
+      location !== undefined ? location.trim().substring(0, 50) : null,
+      avatar_url || null,
+      banner_url || null,
+      req.user.id
+    );
 
-    const updatedUser = db.prepare('SELECT id, username, email, avatar_url, banner_url, bio, role, badge, karma, hangout_hours FROM users WHERE id = ?').get(req.user.id);
+    const updatedUser = db.prepare(`
+      SELECT id, username, display_name, email, avatar_url, banner_url, bio, location,
+             role, badge, custom_badge, verified, karma, reputation_score, cooked_ratio,
+             judgment_accuracy, rank_title, roast_level, hangout_hours, created_at
+      FROM users WHERE id = ?
+    `).get(req.user.id);
+
+    const stats = getUserStats(req.user.id);
 
     return res.json({
       message: 'Profile updated successfully',
-      user: updatedUser
+      user: updatedUser,
+      stats
     });
   } catch (err) {
     console.error('Profile update error:', err);
     return res.status(500).json({ error: 'Failed to update profile.' });
+  }
+});
+
+// Follow / Unfollow Routes
+router.post('/follow/:userId', requireAuth, (req, res) => {
+  const targetId = req.params.userId;
+  if (targetId === req.user.id) {
+    return res.status(400).json({ error: 'You cannot follow yourself.' });
+  }
+
+  const target = db.prepare('SELECT id, username FROM users WHERE id = ?').get(targetId);
+  if (!target) {
+    return res.status(404).json({ error: 'User to follow not found.' });
+  }
+
+  try {
+    db.prepare(`
+      INSERT OR IGNORE INTO user_follows (follower_id, following_id)
+      VALUES (?, ?)
+    `).run(req.user.id, targetId);
+
+    const stats = getUserStats(targetId);
+
+    return res.json({
+      message: `You are now following @${target.username}`,
+      is_following: true,
+      followers_count: stats.followers_count
+    });
+  } catch (err) {
+    console.error('Follow error:', err);
+    return res.status(500).json({ error: 'Failed to follow user.' });
+  }
+});
+
+router.delete('/follow/:userId', requireAuth, (req, res) => {
+  const targetId = req.params.userId;
+
+  try {
+    db.prepare(`
+      DELETE FROM user_follows WHERE follower_id = ? AND following_id = ?
+    `).run(req.user.id, targetId);
+
+    const stats = getUserStats(targetId);
+
+    return res.json({
+      message: 'Unfollowed successfully',
+      is_following: false,
+      followers_count: stats.followers_count
+    });
+  } catch (err) {
+    console.error('Unfollow error:', err);
+    return res.status(500).json({ error: 'Failed to unfollow user.' });
   }
 });
 
@@ -157,3 +285,4 @@ router.get('/anonymous-persona', optionalAuth, (req, res) => {
 });
 
 module.exports = router;
+

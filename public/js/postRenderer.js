@@ -50,10 +50,10 @@ const PostRenderer = {
 
     card.innerHTML = `
       <div class="post-header">
-        <div class="post-author-row">
+        <div class="post-author-row" ${!isAnon && post.author?.username ? `style="cursor: pointer;" onclick="AppRouter.navigate('profile', '${post.author.username}')"` : ''}>
           <img class="author-avatar ${isAnon ? 'ghost-avatar' : ''}" src="${authorAvatar}" alt="${authorName}" loading="lazy">
           <div class="author-meta-text">
-            <span>${this.escapeHTML(authorName)}</span>
+            <span style="${!isAnon ? 'font-weight: 700; color: #fff;' : ''}">${this.escapeHTML(authorName)}</span>
             <span class="author-topic">in ${this.escapeHTML(topicName)}</span>
             <span class="author-dot">·</span>
             <span class="author-time">${timeFormatted}</span>
@@ -526,5 +526,9 @@ const PostRenderer = {
     if (diffHours < 24) return `${diffHours}h ago`;
     const diffDays = Math.round(diffHours / 24);
     return `${diffDays}d ago`;
+  },
+
+  renderPostCard(post) {
+    return this.renderPost(post);
   }
 };

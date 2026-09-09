@@ -17,19 +17,64 @@ function initDatabase() {
     CREATE TABLE IF NOT EXISTS users (
       id TEXT PRIMARY KEY,
       username TEXT UNIQUE NOT NULL,
+      display_name TEXT DEFAULT '',
       email TEXT UNIQUE NOT NULL,
       password_hash TEXT NOT NULL,
       avatar_url TEXT DEFAULT '',
       banner_url TEXT DEFAULT '',
       bio TEXT DEFAULT '',
+      location TEXT DEFAULT 'Everywhere',
       role TEXT DEFAULT 'user' CHECK(role IN ('user', 'moderator', 'admin')),
       badge TEXT DEFAULT 'Neon Pioneer',
+      custom_badge TEXT DEFAULT '👑 FOUNDER',
+      verified INTEGER DEFAULT 0,
       karma INTEGER DEFAULT 100,
+      reputation_score INTEGER DEFAULT 0,
+      cooked_ratio INTEGER DEFAULT 0,
+      judgment_accuracy INTEGER DEFAULT 92,
+      rank_title TEXT DEFAULT '#143 Senior Roaster',
+      roast_level TEXT DEFAULT 'NOVICE ROASTER',
       hangout_hours REAL DEFAULT 0,
       is_banned INTEGER DEFAULT 0,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
+  `);
+
+  // Run safe schema migrations for existing DB
+  const userColumns = [
+    { name: 'display_name', type: "TEXT DEFAULT ''" },
+    { name: 'location', type: "TEXT DEFAULT 'Everywhere'" },
+    { name: 'custom_badge', type: "TEXT DEFAULT '👑 FOUNDER'" },
+    { name: 'verified', type: 'INTEGER DEFAULT 0' },
+    { name: 'reputation_score', type: 'INTEGER DEFAULT 0' },
+    { name: 'cooked_ratio', type: 'INTEGER DEFAULT 0' },
+    { name: 'judgment_accuracy', type: 'INTEGER DEFAULT 92' },
+    { name: 'rank_title', type: "TEXT DEFAULT '#143 Senior Roaster'" },
+    { name: 'roast_level', type: "TEXT DEFAULT 'NOVICE ROASTER'" }
+  ];
+
+  for (const col of userColumns) {
+    try {
+      db.exec(`ALTER TABLE users ADD COLUMN ${col.name} ${col.type};`);
+    } catch (e) {
+      // Column already exists
+    }
+  }
+
+  // User Follows table
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS user_follows (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      follower_id TEXT NOT NULL,
+      following_id TEXT NOT NULL,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      UNIQUE(follower_id, following_id),
+      FOREIGN KEY (follower_id) REFERENCES users(id) ON DELETE CASCADE,
+      FOREIGN KEY (following_id) REFERENCES users(id) ON DELETE CASCADE
+    );
+    CREATE INDEX IF NOT EXISTS idx_follows_follower ON user_follows(follower_id);
+    CREATE INDEX IF NOT EXISTS idx_follows_following ON user_follows(following_id);
   `);
 
   // 2. Sessions table
@@ -261,6 +306,19 @@ function initDatabase() {
     CREATE INDEX IF NOT EXISTS idx_notifications_user_id ON notifications(user_id);
     CREATE INDEX IF NOT EXISTS idx_user_views_post_user ON user_views(post_id, user_id);
   `);
+
+  try {
+    db.prepare(`
+      UPDATE users 
+      SET display_name = CASE WHEN display_name IS NULL OR display_name = '' THEN 'DragMe Official' ELSE display_name END,
+          verified = 1,
+          custom_badge = '👑 FOUNDER',
+          badge = 'Senior Roaster',
+          bio = CASE WHEN bio IS NULL OR bio = '' THEN '👑 Official DragMe Founder & Product Team. Building the rawest space on the internet — no filters, just fire. Roadmap, live feature polls & platform updates.' ELSE bio END,
+          location = CASE WHEN location IS NULL OR location = '' THEN 'Everywhere' ELSE location END
+      WHERE id = 'usr_admin_01'
+    `).run();
+  } catch (e) {}
 
   seedInitialData();
 }

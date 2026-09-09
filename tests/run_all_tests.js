@@ -265,6 +265,65 @@ async function runAllTests() {
       assert.strictEqual(adminRes.status, 200);
       assert.ok(adminRes.data.stats.users_total >= 1);
       assert.ok(adminRes.data.stats.posts_total >= 1);
+    }),
+
+    // 9. Profile Retrieval, Highlights & Follow Lifecycle
+    runTest('User Profile Query & Server-Authoritative Stats', async () => {
+      const res = await request('/api/auth/profile/DragMeMaster');
+      assert.strictEqual(res.status, 200);
+      assert.strictEqual(res.data.user.username, 'DragMeMaster');
+      assert.ok(res.data.stats);
+      assert.strictEqual(typeof res.data.stats.followers_count, 'number');
+      assert.strictEqual(typeof res.data.stats.following_count, 'number');
+      assert.strictEqual(typeof res.data.stats.reactions_count, 'number');
+    }),
+
+    runTest('Profile Update with Validation', async () => {
+      const newBio = 'Updated cyberpunk bio for test persona.';
+      const res = await request('/api/auth/profile', {
+        method: 'PUT',
+        headers: { Authorization: `Bearer ${testUserToken}` },
+        body: JSON.stringify({
+          display_name: 'Neo Tester',
+          bio: newBio,
+          location: 'Neo Tokyo'
+        })
+      });
+
+      assert.strictEqual(res.status, 200);
+      assert.strictEqual(res.data.user.display_name, 'Neo Tester');
+      assert.strictEqual(res.data.user.bio, newBio);
+      assert.strictEqual(res.data.user.location, 'Neo Tokyo');
+    }),
+
+    runTest('Follow & Unfollow Lifecycle with Atomic Follower Counts', async () => {
+      // Follow admin user
+      const followRes = await request('/api/auth/follow/usr_admin_01', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${testUserToken}` }
+      });
+      assert.strictEqual(followRes.status, 200);
+      assert.strictEqual(followRes.data.is_following, true);
+
+      // Unfollow admin user
+      const unfollowRes = await request('/api/auth/follow/usr_admin_01', {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${testUserToken}` }
+      });
+      assert.strictEqual(unfollowRes.status, 200);
+      assert.strictEqual(unfollowRes.data.is_following, false);
+    }),
+
+    runTest('User Content Tabs Stream Query (Posts, Media, Saved)', async () => {
+      const postsRes = await request(`/api/posts/user/${testUserId}?tab=posts`);
+      assert.strictEqual(postsRes.status, 200);
+      assert.ok(Array.isArray(postsRes.data.posts));
+
+      const savedRes = await request('/api/posts/user/saved', {
+        headers: { Authorization: `Bearer ${testUserToken}` }
+      });
+      assert.strictEqual(savedRes.status, 200);
+      assert.ok(Array.isArray(savedRes.data.posts));
     })
   ];
 
